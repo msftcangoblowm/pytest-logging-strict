@@ -1,0 +1,5 @@
+-c pins-typing.in
+-r pins-windows.in
+
+tox
+tox-gh-actions

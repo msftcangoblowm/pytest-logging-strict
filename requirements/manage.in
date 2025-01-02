@@ -1,0 +1,4 @@
+-r pins-typing.in
+-r prod.in
+
+pre-commit
