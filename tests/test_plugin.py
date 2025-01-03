@@ -359,7 +359,8 @@ def test_configure(
     """Test pytest_configure hook"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_configure" tests
     from pytest_logging_strict.plugin import pytest_configure as configure
-    from pytest_logging_strict.plugin import stash_key
+
+    # from pytest_logging_strict.plugin import stash_key
 
     args = ()
     with warnings.catch_warnings(record=False):
@@ -382,9 +383,10 @@ def test_configure(
                 configure(config)
                 """remove temp file tracked by pytest stash. Normally
                 done by pytest_unconfigure"""
-                key = stash_key["config"]
-                stash_inst = config.stash[key]
-                stash_inst.remove()
+                # key = stash_key["config"]
+                # stash_inst = config.stash[key]
+                # stash_inst.remove()
+                pass
 
 
 @pytest.mark.parametrize(
@@ -413,7 +415,8 @@ def test_fixture_get_d_config(
     """Run fixture get_d_config inprocess"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_get_d_config" tests
     from pytest_logging_strict.plugin import pytest_configure as configure
-    from pytest_logging_strict.plugin import stash_key
+
+    # from pytest_logging_strict.plugin import stash_key
 
     is_xdist_plugin_on = False
 
@@ -481,6 +484,7 @@ def test_fixture_get_d_config(
 
                 """remove temp file tracked by pytest stash. Normally
                 done by pytest_unconfigure"""
-                key = stash_key["config"]
-                stash_inst = config.stash[key]
-                stash_inst.remove()
+                # key = stash_key["config"]
+                # stash_inst = config.stash[key]
+                # stash_inst.remove()
+                pass

@@ -298,6 +298,6 @@ ASK FOR ABUSE
 .. |mastodon-msftcangoblowm| image:: https://img.shields.io/mastodon/follow/112019041247183249
     :target: https://mastodon.social/@msftcangoblowme
     :alt: msftcangoblowme on Mastodon
-.. |codecov| image:: https://codecov.io/gh/msftcangoblowm/pytest-logging-strict/graph/badge.svg?token=HCBC74IABR
+.. |codecov| image:: https://codecov.io/gh/msftcangoblowm/pytest-logging-strict/graph/badge.svg?token=3aE90WoGKg
     :target: https://codecov.io/gh/msftcangoblowm/pytest-logging-strict
     :alt: pytest-logging-strict coverage percentage

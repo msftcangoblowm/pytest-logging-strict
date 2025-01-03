@@ -16,6 +16,7 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
+   - fix(plugin): tempfile unlink ignore PermissionError on windows
    - fix(tox.ini): target mypy wrong package name
    - fix: after write flush tempfile or pypy will complain
 

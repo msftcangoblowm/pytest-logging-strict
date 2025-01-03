@@ -108,8 +108,13 @@ class LSConfigStash:
         return cls(logging_strict_config_yaml_path=path_f)
 
     def remove(self):
-        """unlink file"""
-        self.logging_strict_config_yaml_path.unlink(missing_ok=True)
+        """Attempt to unlink temp file"""
+        try:
+            self.logging_strict_config_yaml_path.unlink(missing_ok=True)
+        except OSError:
+            """On Windows. The process cannot access the file because
+            it is being used by another process"""
+            pass
 
     def serialized(self):
         """Getter
