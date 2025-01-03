@@ -222,7 +222,7 @@ Milestones
 
 - classifier
 
-  `pypi.org`_ allows searching by classifiers. So will be easier for everyone
+  pypi.org allows searching by classifiers. So will be easier for everyone
   to identify which packages offer logging config YAML files
 
 License

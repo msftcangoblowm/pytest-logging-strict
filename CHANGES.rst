@@ -16,6 +16,13 @@ Changelog
 
 .. scriv-start-here
 
+.. _changes_0-1-0.post0:
+
+Version 0.1.0.post0 — 2025-01-03
+--------------------------------
+
+- docs(README.rst): fix one link
+
 .. _changes_0-1-0:
 
 Version 0.1.0 — 2025-01-03
