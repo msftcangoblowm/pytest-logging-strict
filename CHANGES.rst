@@ -16,6 +16,13 @@ Changelog
 
 .. scriv-start-here
 
+.. _changes_0-1-0.post1:
+
+Version 0.1.0.post1 — 2025-01-03
+--------------------------------
+
+- ci(test-coverage.yml): fix breaking change by codecov/codecov-action v5
+
 .. _changes_0-1-0.post0:
 
 Version 0.1.0.post0 — 2025-01-03

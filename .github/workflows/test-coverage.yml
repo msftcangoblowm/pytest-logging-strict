@@ -154,7 +154,7 @@ jobs:
         slug: msftcangoblowm/pytest-logging-strict
         os: linux
         flags: unittests
-        file: ./coverage.xml
+        files: ./coverage.xml
         env_vars: OS,PYTHON
         fail_ci_if_error: true
         verbose: true
