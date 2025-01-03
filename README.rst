@@ -13,6 +13,8 @@ pytest fixture logging configured from packaged YAML
 
 **New in 0.1.x**
 
+initial release;
+
 Why?
 -----
 
