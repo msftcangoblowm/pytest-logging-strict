@@ -173,7 +173,7 @@ def test_fixture_logging_strict(
 
     #    a test file
     #    import logging_strict as ls
-    name = "test_foobar"
+    name = "test_logging_strict_main"
     test_text = (
         f"""
             import logging
@@ -182,7 +182,7 @@ def test_fixture_logging_strict(
             import pytest
 
             @pytest.mark.logging_package_name("{dotted_path_handler_package_name}" if "{dotted_path_handler_package_name}" != "None" else None)
-            def test_fcn(logging_strict):
+            def test_fcn_logging_strict_main(logging_strict):
                 # fixture method should delay execution. So can control when
                 # logging config YAML verification and logger initializing occurs
                 t_two = logging_strict()
@@ -229,9 +229,31 @@ def test_fixture_logging_strict(
 
         """,
     )
-
     pytester.makepyfile(**{name: test_text})
-    args = ("--showlocals", "-vv", "-k", "test_fcn")
+
+    """
+    import os
+    path_covrc = pytester.path.joinpath(".coveragerc")
+    path_cov = pytester.path.joinpath(".coverage_sub")
+    coveragerc = (
+        f"[run]{os.linesep}"
+        f"data_file={str(path_cov)}{os.linesep}{os.linesep}"
+    )
+    if not path_covrc.exists():
+        path_covrc.write_text(coveragerc)
+
+    if os.environ.get("COVERAGE_PROCESS_START", None) is None:
+        # normally should contain path to a .coveragerc file
+        os.environ["COVERAGE_PROCESS_START"] = path_covrc.as_posix()
+    """
+    pass
+
+    args = (
+        "--showlocals",
+        "-vv",
+        "-k",
+        "test_fcn_logging_strict_main",
+    )
     kwargs = {}
     run_result = pytester.runpytest_subprocess(*args, **kwargs)
     out = run_result.outlines  # noqa: F841
@@ -337,6 +359,7 @@ def test_configure(
     """Test pytest_configure hook"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_configure" tests
     from pytest_logging_strict.plugin import pytest_configure as configure
+    from pytest_logging_strict.plugin import stash_key
 
     args = ()
     with warnings.catch_warnings(record=False):
@@ -357,3 +380,107 @@ def test_configure(
             with warnings.catch_warnings(record=False):
                 warnings.simplefilter(action="ignore", category=UserWarning)
                 configure(config)
+                """remove temp file tracked by pytest stash. Normally
+                done by pytest_unconfigure"""
+                key = stash_key["config"]
+                stash_inst = config.stash[key]
+                stash_inst.remove()
+
+
+@pytest.mark.parametrize(
+    (
+        "package_name, package_version, yaml_package_name, "
+        "package_data_folder_start, category, genre, flavor, version_no, "
+        "dotted_path_handler_package_name, expected_type, msg"
+    ),
+    testdata_config_in_pyproject_toml,
+    ids=ids_config_in_pyproject_toml,
+)
+def test_fixture_get_d_config(
+    package_name,
+    package_version,
+    yaml_package_name,
+    package_data_folder_start,
+    category,
+    genre,
+    flavor,
+    version_no,
+    dotted_path_handler_package_name,
+    expected_type,
+    msg,
+    pytester,
+):
+    """Run fixture get_d_config inprocess"""
+    # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_get_d_config" tests
+    from pytest_logging_strict.plugin import pytest_configure as configure
+    from pytest_logging_strict.plugin import stash_key
+
+    is_xdist_plugin_on = False
+
+    # prepare
+    #    conftest.py
+    path_src = Path(__file__).parent.joinpath("conftest.py")
+    conftest_text = path_src.read_text()
+    pytester.makeconftest(conftest_text)
+
+    #    no pyproject.toml nor cli
+    args = ()
+    with warnings.catch_warnings(record=False):
+        warnings.simplefilter(action="ignore", category=UserWarning)
+        config = pytester.parseconfig(*args)
+
+    #    pre-extracted logging strict YAML file
+    path_f = Path(__file__).parent.joinpath(
+        "_good_files",
+        "mp_1_asz.worker.logging.config.yaml",
+    )
+    str_yaml = path_f.read_text()
+
+    name = "test_get_d_config"
+    source = (
+        f"""
+            from collections.abc import Mapping
+            from pathlib import PurePath
+            import pytest
+
+            @pytest.mark.logging_package_name("{dotted_path_handler_package_name}" if "{dotted_path_handler_package_name}" != "None" else None)
+            def test_fcn_get_d_config(get_d_config):
+                d_config = get_d_config()
+                # could fail due to not found or validation
+                if d_config is None:
+                    # error occurred. Check warnings
+                    assert '{expected_type!s}' == 'None'
+                else:
+                    assert isinstance(d_config, Mapping)
+
+        """,
+    )
+    pytester.makepyfile(**{name: source})
+
+    with patch(
+        "pytest_logging_strict.plugin.get_yaml",
+        return_value=str_yaml,
+    ):
+        with patch(
+            "pytest_logging_strict.plugin._is_xdist",
+            return_value=is_xdist_plugin_on,
+        ):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter(action="ignore", category=UserWarning)
+                configure(config)
+
+                # run inline not within a subprocess
+                args = ("--showlocals", "-vv", f"{name}.py")
+                kwargs = {}
+                run_result = pytester.runpytest_inprocess(*args, **kwargs)
+                out = run_result.outlines  # noqa: F841
+                err = run_result.errlines  # noqa: F841
+                outcomes = run_result.parseoutcomes()  # noqa: F841
+                exit_code = run_result.ret
+                assert exit_code == 0
+
+                """remove temp file tracked by pytest stash. Normally
+                done by pytest_unconfigure"""
+                key = stash_key["config"]
+                stash_inst = config.stash[key]
+                stash_inst.remove()

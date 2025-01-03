@@ -75,5 +75,5 @@ ifeq ($(is_venv),1)
 	-@$(VENV_BIN_PYTHON) -m coverage erase
 	$(VENV_BIN_PYTHON) -m coverage run --parallel -m pytest --showlocals $(verbose_text) tests
 	$(VENV_BIN_PYTHON) -m coverage combine
-	$(VENV_BIN_PYTHON) -m coverage report --fail-under=70
+	$(VENV_BIN_PYTHON) -m coverage report --fail-under=80
 endif

@@ -1,5 +1,10 @@
 * Release checklist
 
+- Adjust coverage fail under minimal percentage
+  tox-test.ini
+  .github/workflows/test-coverage.yml
+  pyproject.toml [tool.coverage.report]
+  Makefile target coverage
 - Run twice
   $ make pre-commit
 - Remove old branches

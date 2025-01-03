@@ -16,6 +16,9 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
+   - fix(tox.ini): target mypy wrong package name
+   - fix: after write flush tempfile or pypy will complain
+
    - feat: pytest plugin for initializing logging
    - chore: add pre-commit support
    - chore: add Makefile
