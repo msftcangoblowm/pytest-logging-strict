@@ -18,11 +18,16 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - feat: integrate logging-strict logging config registry API
-   - fix(requirements-dev): add nudge pin for package virtualenv to mitigate CVE-2024-53899
-   - ci(quality): build README.rst using rst2html5
-
 .. scriv-start-here
+
+.. _changes_0-2-0:
+
+Version 0.2.0 — 2025-01-19
+--------------------------------
+
+- feat: integrate logging-strict logging config registry API
+- fix(requirements-dev): add nudge pin for package virtualenv to mitigate CVE-2024-53899
+- ci(quality): build README.rst using rst2html5
 
 .. _changes_0-1-0.post1:
 

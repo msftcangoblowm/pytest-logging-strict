@@ -11,6 +11,10 @@ pytest fixture logging configured from packaged YAML
 
 \* Python 3.9 through 3.13, PyPy
 
+**New in 0.2.x**
+
+registry implementation;
+
 **New in 0.1.x**
 
 initial release;
