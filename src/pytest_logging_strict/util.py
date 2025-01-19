@@ -4,17 +4,27 @@
 As much as possible, into a separate module, separate out imports to logging_strict.
 
 .. py:data:: __all__
-   :type: tuple[str, str]
-   :value: ("get_yaml", "update_parser",)
+   :type: tuple[str, str, str, str]
+   :value: ("get_query_v1", "get_temp_folder", "get_yaml_v0", "update_parser",)
 
    Module exports
+
+.. py:data:: IMPLEMENTATION_VERSION_NO_DEFAULT
+   :type: str
+   :value: "1"
+
+   Fallback plugin implementation version no
 
 """
 
 from __future__ import annotations
 
+import tempfile
 import warnings
 from collections.abc import Sequence
+from contextlib import suppress
+from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -22,15 +32,37 @@ import strictyaml as s
 from logging_strict.constants import LoggingConfigCategory
 from logging_strict.logging_api import LoggingConfigYaml
 from logging_strict.logging_yaml_abc import as_str
+from logging_strict.util.check_type import is_not_ok
 
 __all__ = (
-    "get_yaml",
+    "get_query_v1",
+    "get_temp_folder",
+    "get_yaml_v0",
     "update_parser",
 )
 
 APP_NAME_TOKEN = "logging_strict"
 CLI_NAME_TOKEN = "logging-strict"
+IMPLEMENTATION_VERSION_NO_DEFAULT = "1"
 IMPLEMENTATION_PACKAGE_NAME = APP_NAME_TOKEN
+
+
+def _is_xdist(config):
+    """Check whether xdist plugin is enabled
+
+    :param config: pytest configuration
+    :type config: pytest.Config
+    :returns: The plugin registered under the given name otherwise None
+    :rtype: typing.Any | None
+
+    .. seealso::
+
+       `pluggy.PluginManager.get_plugin <https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluginManager.get_plugin>`_
+
+    """
+    ret = config.pluginmanager.getplugin("xdist")
+
+    return ret
 
 
 def get_qualname(name):
@@ -153,10 +185,17 @@ def update_parser(parser: pytest.Parser):
     :type parser: pytest.Parser
     """
     target_file_desc = "logging config YAML file"
+
+    help_plugin_impl_version_no = (
+        "Per package there can only be one pytest plugin. Choose the plugin "
+        "implementation. Mature implementations can be keep around and "
+        "gradually phased out"
+    )
+
     help_package_name = f"name of the package containing {target_file_desc}"
     help_package_data_folder_start = (
         "Package base data folder name. Packages may customize. Does "
-        "not assume folder is 'data'"
+        "not assume folder is 'data'. Plugin implementation v0 only"
     )
     help_category = "Narrow down the search. Filter by process purpose"
     help_genre = (
@@ -178,6 +217,15 @@ def update_parser(parser: pytest.Parser):
 
     group = parser.getgroup(CLI_NAME_TOKEN)
 
+    _add_option(
+        parser,
+        group,
+        name="impl_version_no",
+        help_text=help_plugin_impl_version_no,
+        default=IMPLEMENTATION_VERSION_NO_DEFAULT,
+        required=False,
+        choices=["0", "1"],
+    )
     _add_option(
         parser,
         group,
@@ -264,7 +312,81 @@ def _get_fallback_package_name() -> str:
     return ret
 
 
-def get_yaml(conf, path_f):
+def get_yaml_v1_extract(conf, path_alternative_dest_folder=None):
+    """Retrieve registry db YAML file.
+
+    Save into stash.
+
+    :param conf: pytest configuration class instance
+    :type conf: pytest.Config
+    :param path_alternative_dest_folder: absolute path to destination folder
+    :type path_alternative_dest_folder: pathlib.Path | None
+    :returns: package name and path to Registry of logging config YAML files
+    :rtype: tuple[str | None, Pathlib.Path | None]
+    """
+    try:
+        # logging-strict>=1.4.2
+        from logging_strict.register_config import ExtractorLoggingConfig
+    except ImportError:
+        raise
+
+    # requirements -- extract registry db
+    name = get_qualname("yaml_package_name")
+    package_name = _get_arg_value(conf, name, _get_fallback_package_name())
+
+    # :code:`is_test_file=False` -- retrieving db, not the logging config YAML file
+    if is_not_ok(package_name):
+        package_name_fixed = None
+        path_registry = None
+    else:
+        elc = ExtractorLoggingConfig(
+            package_name,
+            path_alternative_dest_folder=path_alternative_dest_folder,
+        )
+        # could raise strictyaml.YAMLValidationError
+        elc.extract_db()
+        package_name_fixed = elc.package_name
+        path_registry = elc.path_extracted_db
+
+    t_ret = (package_name_fixed, path_registry)
+
+    return t_ret
+
+
+def get_query_v1(conf):
+    """Gather registry query. Originating from pyproject or cli.
+
+    :param conf: pytest configuration class instance
+    :type conf: pytest.Config
+    :returns: query dict
+    :rtype: dict[str, str | None]
+    """
+    if TYPE_CHECKING:
+        d_conf: dict[str, str | None]
+        fields: tuple[tuple[str | None], ...]
+        name: str
+        fallback: str | None
+        qualname: str
+        val: str | None
+
+    d_conf = {}
+
+    fields = (
+        ("yaml_package_name", _get_fallback_package_name()),
+        ("category", _get_fallback_category()),
+        ("genre", None),
+        ("flavor", None),
+        ("version_no", None),
+    )
+    for name, fallback in fields:
+        qualname = get_qualname(name)
+        val = _get_arg_value(conf, qualname, fallback)
+        d_conf[name] = val
+
+    return d_conf
+
+
+def get_yaml_v0(conf, path_f):
     """When session starts prepare, but do not apply, logging configuration.
 
     - If using plugin, configuration **must** be supplied: in ini or on cli
@@ -423,7 +545,7 @@ def _get_arg_value(conf, name, fallback):
     :param fallback: fallback value
     :type fallback: str | None
     :returns: configuration value supplied by cli or config
-    :rtype: str
+    :rtype: str | None
     """
     # qualname = get_qualname(name)
     value_cli = conf.getoption(name)
@@ -441,3 +563,15 @@ def _get_arg_value(conf, name, fallback):
             ret = fallback
 
     return ret
+
+
+def get_temp_folder():
+    """Get the temp folder. Would prefer in a randomized subfolder"""
+    f = tempfile.NamedTemporaryFile(delete=False)
+    path_f = Path(f.name)
+    path_alternative_dest_folder = path_f.parent
+    with suppress(OSError):
+        f.close()
+        path_f.unlink()
+
+    return path_alternative_dest_folder

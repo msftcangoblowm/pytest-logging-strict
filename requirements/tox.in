@@ -1,4 +1,5 @@
 -c pins-typing.in
+-c pins-virtualenv-cve-2024-53899.in
 -r pins-windows.in
 
 tox

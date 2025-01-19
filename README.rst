@@ -19,39 +19,42 @@ Why?
 -----
 
 Every single test, of interest, has boilerplate to setup the logging
-configuration. Which is coming from a variable in a constants module.
+configuration or a shortcut to avoid it e.g. pytest fixture ``caplog``.
 
-In each and every package. That logging configuration is hardcoded.
+If there is a logging configuration, that comes from each package.
+Somewhere, there is a logging configuration module or a call to
+``logging.basicConfig``.
 
-``logging-strict`` package manages logging configurations as strictly
-validated YAML files. ``pytest-logging-strict`` adds pytest integration
-which includes an easy to use fixture.
+Logging boilerplate configuration code is dodgy, nonsense, hardcoded,
+not portable, and hobbles usage of most built-in logging features.
 
-The alternatives is pull a str or a dict from a constants module. Or
-dealing with built-in pytest fixture, caplog.
+- ``logging-strict`` -- Manages logging configurations by
+  providing APIs to access both the registry and the logging config YAML
+  files
+
+- ``pytest-logging-strict`` -- adds pytest integration
 
 With pytest integration:
 
 - querying
 
   Once per pytest session. Query options are provided in
-  ``pyproject.toml``. cli provided options override.
+  ``pyproject.toml`` and cli options can override.
 
-  Pulls the logging config YAML from logging-strict, but can pull from
-  any installed package. Can submit your logging config YAML file to
-  ``logging-strict``.
+  Pulls the registry and logging config YAML from ``logging-strict``
+  or third party package.
 
-  Share your logging configuration. Have it accessible and available
-  for all your packages, and as a bonus, everyone elses' packages.
+  Share your logging configuration. Can submit your logging config YAML
+  file to ``logging-strict`` for curation.
 
 - extracting
 
-  Once per pytest session. Overrides logging-strict to force extracting
-  into session scoped temp folder. After each session automagically removed.
+  Once per pytest session. Extracts into a session scoped temp folder.
+  Afterwards, session registry and logging config YAML files are removed
 
 - pytest fixture
 
-  Use ``logging_strict`` fixture. Provides both the logger and list of
+  ``logging_strict`` fixture provides both the logger **and** list of
   all available loggers.
 
   So know which loggers are enabled besides only the main package logger
@@ -75,13 +78,47 @@ In ``conftest.py``
 
 In ``pyproject.toml``
 
-Customize the query. If not, the default is taken from ``logging-strict`` package.
+Customize the query
+""""""""""""""""""""
+
+All query options are optional and have a default.
+
+If no query options are provided, the result will be to use the
+default logging strict YAML file. This is highly discouraged. Provide a query.
+
+- yaml_package_name -- which package to use
+
+  The default is ``yaml_package_name = 'logging-strict'``. But can curate
+  logging config YAML in your own package or third party packages.
+  This is burdensome and troublesome, so hoping to curate into one package.
+
+- category -- app has additional dependencies, worker does not
+
+  e.g. ``category = 'app'`` with ``genre = textual``
+  **has additional dependency**, ``textual``
+
+impl_version_no -- a coin flip of two unfortunite choices
+
+- Do not provide it
+
+  Use the latest implementation, which might introduce breakage.
+
+- Provide it
+
+  e.g. ``impl_version_no = '1'``
+
+  Stick with a known to work safe implementation. At some later date,
+  could be phased out, resulting in breakage.
+
+There is no plan to introduce any more implementations
+
+In ``pyproject.toml``
 
 .. code:: shell
 
     [tool.pytest.ini_options]
+    logging_strict_impl_version_no = '1'
     logging_strict_yaml_package_name = 'logging_strict'
-    logging_strict_package_data_folder_start = 'configs'
     logging_strict_category = 'worker'
     logging_strict_genre = 'mp'
     logging_strict_flavor = 'asz'
@@ -91,14 +128,47 @@ and/or cli
 
 .. code:: shell
 
-   pytest --showlocals -vv --logging-strict-yaml-package-name = 'logging_strict' \
-   --logging-strict-package-data-folder-start = 'configs' \
+   pytest --showlocals -vv \
+   --logging-strict-impl-version-no = '1' \
+   --logging-strict-yaml-package-name = 'logging_strict' \
    --logging-strict-category = 'worker' \
    --logging-strict-genre = 'mp' \
    --logging-strict-flavor = 'asz' \
    --logging-strict-version-no = '1' tests
 
 The cli overrides ``pyproject.toml`` settings.
+
+impl_version_no 0
+""""""""""""""""""
+
+``impl_version_no 1`` introduced ``logging_config.yml`` registry for logging
+config YAML files. The registry YAML file is strictly and safely validated.
+
+This removed the need to worry about:
+
+- In which subfolder the logging config YAML file resides
+
+- the file name, following a strict naming convention and
+  encoding meta data
+
+The default impl_version_no is now 1. To use impl_version_no 0, both
+impl_version_no and package_data_folder_start are required
+
+In ``pyproject.toml``
+
+.. code:: text
+
+   logging_strict_impl_version_no = '0'
+   logging_strict_package_data_folder_start = 'configs'
+
+cli
+
+.. code:: text
+
+   --logging-strict-impl-version-no = '0' \
+   --logging-strict-package-data-folder-start = 'configs'
+
+``impl_version_no 0`` will be phased out as ``impl_version_no 1`` matures
 
 Usage
 ------
@@ -166,21 +236,32 @@ Batteries included
 
 **textual console apps**
 
+As mentioned previously, ``category = 'app'`` with ``genre = 'textual'``
+logging config has additional dependency, ``textual``.
+
+Trying to use a logging config without first the installing the required
+dependency, ``textual``, results in an Exception and traceback.
+
 .. code:: shell
 
-   pytest --showlocals -vv --logging-strict-yaml-package-name = 'logging_strict' \
-   --logging-strict-package-data-folder-start = 'configs' \
+   pytest --showlocals -vv \
+   --logging-strict-yaml-package-name = 'logging_strict' \
    --logging-strict-category = 'app' \
    --logging-strict-genre = 'textual' \
    --logging-strict-flavor = 'asz' \
    --logging-strict-version-no = '1' tests
 
-**multiprocess worker** -- default
+``--logging-strict-impl-version-no = '1'`` is optional
+
+**multiprocess worker** -- use as default
+
+``category = 'worker'`` is to query logging config that
+**do not require any additional dependencies**.
 
 .. code:: shell
 
-   pytest --showlocals -vv --logging-strict-yaml-package-name = 'logging_strict' \
-   --logging-strict-package-data-folder-start = 'configs' \
+   pytest --showlocals -vv \
+   --logging-strict-yaml-package-name = 'logging_strict' \
    --logging-strict-category = 'worker' \
    --logging-strict-genre = 'mp' \
    --logging-strict-flavor = 'asz' \
@@ -193,8 +274,8 @@ In the meantime or if not in the mood to share
 
 .. code:: shell
 
-   pytest --showlocals -vv --logging-strict-yaml-package-name = 'zope.interface' \
-   --logging-strict-package-data-folder-start = 'data' \
+   pytest --showlocals -vv \
+   --logging-strict-yaml-package-name = 'zope.interface' \
    --logging-strict-category = 'worker' \
    --logging-strict-genre = 'mp' \
    --logging-strict-flavor = 'mine' \
@@ -212,13 +293,17 @@ Milestones
 
 - Simplify querying
 
+  Support for a registry of logging config YAML records.
+
+  The registry is a package data file, ``logging_config.yml``
+
+  HISTORY
+
   `logging-strict#4 <https://github.com/msftcangoblowm/logging-strict/issues/4>`_
-  will add support for a config TOML file. Which will contain logging config YAML records.
 
-  Then the file naming convention will be dropped.
+  logging-strict-1.5.0 adds registry API
 
-  The config TOML file is placed at the package base folder. And is the reference point
-  to advertise which logging config YAML files are in the package.
+  support added in 0.2.0
 
 - classifier
 
@@ -246,7 +331,8 @@ ACTUALLY DO SOMETHING ... ANYTHING
 - request features
 - submit issues
 - submit PRs
-- follow on mastodon. Dropping messages to **say hello** or share offensive memes
+- follow on mastodon. Dropping messages to **say hello** or share
+  offensive memes
 - translate the docs into other languages
 - leave a github star on repos you like
 - write distribute and market articles to raise awareness
@@ -258,12 +344,14 @@ ASK FOR HELP
 
 FOSS FUNDING
 
-- apply force and coersion to take your monero or litecoin
+- apply force and coersion to ensure maintanence continues. Funding
+  should be unencumbered. This are accepted: monero or litecoin
 
-- fund travel to come out to speak at tech conferences (currently residing in West Japan)
+- fund travel to come out to speak at tech conferences (reside in West Japan)
 
-- Mr. Money McBags printer goes Brrrrr. Get assistance towards identifying
-  package maintainers in need of funding
+- Hey Mr. Money McBags printer goes Brrrrr! Protest your tech stack by
+  identifying package maintainers in need of funding.
+  Ask which package maintainers are starving and planning retribution
 
 ASK FOR ABUSE
 

@@ -8,11 +8,19 @@ Changelog
    Feature request
    .................
 
+   - `rst2html5 alternative <https://github.com/marianoguerra/rst2html5/>`_
+     Not maintained package. Would require forking and maintaining
+     In the interm, use docutils
+
    Known regressions
    ..................
 
    Commit items for NEXT VERSION
    ..............................
+
+   - feat: integrate logging-strict logging config registry API
+   - fix(requirements-dev): add nudge pin for package virtualenv to mitigate CVE-2024-53899
+   - ci(quality): build README.rst using rst2html5
 
 .. scriv-start-here
 

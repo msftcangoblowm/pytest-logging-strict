@@ -1,15 +1,8 @@
 """
 .. moduleauthor:: Dave Faulkmore <https://mastodon.social/@msftcangoblowme>
 
-.. py:data:: item_marker
-   :type: str
-   :value: "logging_package_name"
-
-   Name of a pytest marker. Takes one argument, a dotted path logger
-   handlers package name
-
 .. py:data:: stash_key
-   :type: dict[str, pytest.StashKey[pytest_logging_strict.plugin.LSConfigStash]]
+   :type: dict[str, pytest.StashKey[pytest_logging_strict.plugin_v0.LSConfigStash]]
 
    Holds path to raw logging config YAML file.
 
@@ -55,9 +48,11 @@ import strictyaml as s
 from logging_strict.logging_yaml_abc import after_as_str_update_package_name
 from logging_strict.logging_yaml_validate import validate_yaml_dirty
 
-from .util import (
-    get_yaml,
-    update_parser,
+from .plugin_shared import item_marker
+from .util import get_yaml_v0
+from .util_xdist import (
+    is_xdist,
+    xdist_workerinput,
 )
 
 
@@ -82,7 +77,7 @@ class LSConfigStash:
         :param serialized: posix path to set into pytest stash
         :type serialized: str | pathlib.Path
         :returns: key used by pytest.stash
-        :rtype: pytest_logging_strict.plugin.LSConfigStash
+        :rtype: pytest_logging_strict.plugin_v0.LSConfigStash
         :raises:
 
            - :py:exc:`TypeError` -- unsupported type expecting absolute
@@ -125,64 +120,12 @@ class LSConfigStash:
         return str(self.logging_strict_config_yaml_path)
 
 
-item_marker = "logging_package_name"
 stash_key = {
     "config": pytest.StashKey[LSConfigStash](),
 }
 
 
-def _is_xdist(config):
-    """Check whether xdist plugin is enabled
-
-    :param config: pytest configuration
-    :type config: pytest.Config
-    :returns: The plugin registered under the given name otherwise None
-    :rtype: typing.Any | None
-
-    .. seealso::
-
-       `pluggy.PluginManager.get_plugin <https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluginManager.get_plugin>`_
-
-    """
-    ret = config.pluginmanager.getplugin("xdist")
-
-    return ret
-
-
-def _xdist_worker(config):
-    """Get pytest config passed to worker.
-
-    :param config: pytest configuration
-    :type config: pytest.Config
-    :returns: xdist worker input
-    :rtype: dict[str, typing.Any]
-    """
-    try:
-        ret = {"input": _xdist_workerinput(config)}
-    except AttributeError:
-        ret = {}
-
-    return ret
-
-
-def _xdist_workerinput(node):
-    """mypy complains that :py:class:`pytest.Config` does not have this
-    attribute, but ``xdist.remote`` defines it in worker processes.
-
-    :param node: A xdist worker
-    :type node: xdist.workermanage.WorkerController | pytest.Config
-    :returns: workerinput
-    :rtype: typing.Any
-    """
-    try:
-        ret = node.workerinput  # type: ignore[union-attr]
-    except AttributeError:  # compat xdist < 2.0
-        ret = node.slaveinput  # type: ignore[union-attr]
-
-    return ret
-
-
-class LoggingStrictXdistControllerPlugin:
+class LoggingStrictv0XdistControllerPlugin:
     """pytest-xdist plugin that is only registered on xdist controller processes"""
 
     def pytest_configure_node(self, node):
@@ -191,12 +134,12 @@ class LoggingStrictXdistControllerPlugin:
         :param node: A worker instance
         :type node: xdist.workermanage.WorkerController
         """
-        _xdist_workerinput(node)["logging_config_yaml_serialized"] = node.config.stash[
+        xdist_workerinput(node)["logging_config_yaml_serialized"] = node.config.stash[
             stash_key["config"]
         ].serialized()
 
 
-def pytest_configure(config):
+def _configure(config, xdist_worker_):
     """Initialize the path used to cache raw logging config YAML.
 
     Configure the plugin based on the CLI.
@@ -221,6 +164,8 @@ def pytest_configure(config):
 
     :param config: pytest configuration
     :type config: pytest.Config
+    :param xdist_worker_: pytest config passed to worker
+    :type xdist_worker_: dict[str, xdist.workermanage.WorkerController | pytest.Config]
 
     .. todo:: Change base folder
 
@@ -229,10 +174,9 @@ def pytest_configure(config):
        folder be in a pytest determined location?
 
     """
-    xdist_worker = _xdist_worker(config)
     key = stash_key["config"]
-    if not xdist_worker:
-        config.pluginmanager.register(LoggingStrictControllerPlugin())
+    if not xdist_worker_:
+        config.pluginmanager.register(LoggingStrictv0ControllerPlugin())
 
         """
         import os
@@ -267,7 +211,7 @@ def pytest_configure(config):
 
         """Search for logging config YAML file. Validate then write
         contents to buffer then flush to temp file"""
-        str_yaml = get_yaml(config, path_f)
+        str_yaml = get_yaml_v0(config, path_f)
         if str_yaml is not None:
             bytes_yaml = str_yaml.encode("utf-8")
             f.write(bytes_yaml)
@@ -286,14 +230,14 @@ def pytest_configure(config):
 
         # If xdist is enabled, then the results path should be exposed to
         # the workers so that they know where to read raw logging config YAML from.
-        if _is_xdist(config):
-            config.pluginmanager.register(LoggingStrictXdistControllerPlugin())
+        if is_xdist(config):
+            config.pluginmanager.register(LoggingStrictv0XdistControllerPlugin())
         else:  # pragma: no cover
             pass
     else:
         # xdist workers create the stash using input from the controller plugin.
         config.stash[key] = LSConfigStash.from_serialized(
-            xdist_worker["input"]["logging_config_yaml_serialized"]
+            xdist_worker_["input"]["logging_config_yaml_serialized"]
         )
 
     # https://docs.pytest.org/en/stable/how-to/writing_plugins.html#registering-custom-markers
@@ -303,7 +247,7 @@ def pytest_configure(config):
     )
 
 
-class LoggingStrictControllerPlugin:
+class LoggingStrictv0ControllerPlugin:
     """pytest plugin for logging-strict"""
 
     def pytest_unconfigure(self, config):
@@ -314,20 +258,6 @@ class LoggingStrictControllerPlugin:
         """
         stash_inst = config.stash[stash_key["config"]]
         stash_inst.remove()
-
-
-def pytest_addoption(parser):
-    """The config options are search filters. To aid in finding a raw
-    logging strict config YAML. The logging configuration is then always known,
-    strictly validated against a schema, DRY, and hopefully UX intuitive.
-
-    - which package to configure logging for.
-    - choose logging config YAML
-
-    :param parser: pytest argparse parser
-    :type parser: pytest.Parser
-    """
-    update_parser(parser)
 
 
 @pytest.fixture(scope="session")
@@ -505,7 +435,8 @@ def logging_strict(
 
        @pytest.mark.logging_package_name("wreck")
        def test_test_something(logging_strict):
-           logger = logging_strict
+           if t_loggers is not None:
+               logger, lst_loggers = t_loggers
            logger.info("Hello World!")
 
     logging_package_name -- dotted path or package name. logging handler id

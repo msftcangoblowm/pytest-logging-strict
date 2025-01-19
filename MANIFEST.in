@@ -24,8 +24,8 @@ include tox.ini
 recursive-include requirements *.in *.unlock *.lock
 
 # tests
-include tests/conftest.py
-include tests/__init__.py
+recursive-include tests *.py
+recursive-include tests *.logging.config.yaml
 
 # github
 graft .github

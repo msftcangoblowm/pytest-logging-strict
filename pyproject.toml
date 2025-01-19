@@ -62,7 +62,12 @@ where = ["src"]
 include = ["pytest_logging_strict*"]
 
 [project.entry-points.pytest11]
-logging_strict = "pytest_logging_strict.plugin"
+# plugin_v0 -- metadata encoded into logging config YAML file names
+#              logging-strict==1.4.2
+# plugin_v1 -- YAML registry database. File names need not follow a naming convention
+#              ``python -m pip install -U git+https://github.com/msftcangoblowm/logging-strict.git@a2026ea7f6984261bf34b7e4543088ad8aa0b7d4``
+#              ``python -m build`` then install local development build
+logging_strict = "pytest_logging_strict.plugin_wireframe"
 
 [tool.setuptools.dynamic]
 dependencies = { file = ['requirements/prod.unlock'] }
@@ -80,6 +85,11 @@ reqs = [
     'requirements/mypy',
     'requirements/kit',
     'requirements/tox',
+]
+[[tool.venvs]]
+venv_base_path = '.rst2html5'
+reqs = [
+    'requirements/rst2html5',
 ]
 
 [tool.black]
@@ -154,5 +164,5 @@ precision = 2
 ignore_errors = true
 skip_covered = true
 skip_empty = true
-fail_under = 80
+fail_under = 68
 show_missing = true

@@ -5,7 +5,7 @@ Test module pytest_logging_strict.util
 
 .. code-block:: shell
 
-   pytest --showlocals -vv tests/test_util.py
+   pytest --showlocals -vv tests/test_v0/test_util_v0.py
 
 """
 
@@ -19,10 +19,10 @@ from pytest_logging_strict.util import (
     _parse_option_value,
     get_optname,
     get_qualname,
-    get_yaml,
+    get_yaml_v0,
 )
 
-testdata_get_yaml = (
+testdata_get_yaml_v0 = (
     (
         "logging_strict",
         "configs",
@@ -100,7 +100,7 @@ testdata_get_yaml = (
         None,
     ),
 )
-ids_get_yaml = (
+ids_get_yaml_v0 = (
     "successful query",
     "Has sane default for package name",
     "Has sane default for package_start_folder_name",
@@ -116,10 +116,10 @@ ids_get_yaml = (
         "yaml_package_name, package_data_folder_start, category, genre, "
         "flavor, version_no, return_type, warning_msg"
     ),
-    testdata_get_yaml,
-    ids=ids_get_yaml,
+    testdata_get_yaml_v0,
+    ids=ids_get_yaml_v0,
 )
-def test_get_yaml(
+def test_get_yaml_v0(
     yaml_package_name,
     package_data_folder_start,
     category,
@@ -129,18 +129,21 @@ def test_get_yaml(
     return_type,
     warning_msg,
     pytester: pytest.Pytester,
+    impl_version_no,
 ):
     """Call pytest_addoption to test util module"""
-    # pytest --showlocals -r a -vv --log-level INFO -k "test_get_yaml" tests
+    # pytest --showlocals -r a -vv --log-level INFO -k "test_get_yaml_v0" tests
     path_pytester = pytester.path  # noqa: F841
     # prepare
     #    conftest.py
-    path_src = Path(__file__).parent.joinpath("conftest.py")
+    path_src = Path(__file__).parent.parent.joinpath("conftest.py")
     conftest_text = path_src.read_text()
     pytester.makeconftest(conftest_text)
 
     #    cli options
     args = [
+        get_optname("impl_version_no"),
+        impl_version_no,
         get_optname("yaml_package_name"),
         yaml_package_name,
         get_optname("package_data_folder_start"),
@@ -173,7 +176,7 @@ def test_get_yaml(
 
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter(action="ignore", category=UserWarning)
-        out_actual = get_yaml(conf, path_f)
+        out_actual = get_yaml_v0(conf, path_f)
         if len(w) == 1:
             assert issubclass(w[-1].category, UserWarning)
             msg_actual = str(w[-1].message)
