@@ -18,6 +18,8 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
+   - ci: bump dependencies version
+
 .. scriv-start-here
 
 .. _changes_0-2-0:
