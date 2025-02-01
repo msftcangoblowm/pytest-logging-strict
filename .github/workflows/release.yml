@@ -36,7 +36,7 @@ jobs:
     # checkout and python-setup
     # Not using drain-swamp; outputs are ignored
     - name: "Build Plugin parameters"
-      uses: msftcangoblowm/drain-swamp-action@1.0.2
+      uses: msftcangoblowm/drain-swamp-action@1.0.4
       with:
         plugin_parameters: '{"kind": "tag"}'
         checkout: true

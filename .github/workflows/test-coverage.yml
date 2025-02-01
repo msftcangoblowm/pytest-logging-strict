@@ -52,7 +52,7 @@ jobs:
     - id: prepare-config-settings
       name: >-
         Build Plugin parameters
-      uses: msftcangoblowm/drain-swamp-action@1.0.2
+      uses: msftcangoblowm/drain-swamp-action@1.0.4
       with:
         plugin_parameters: '{"kind": "current"}'
         checkout: true
