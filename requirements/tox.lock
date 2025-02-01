@@ -22,7 +22,7 @@ pluggy==1.5.0
     # via tox
 pyproject-api==1.8.0
     # via tox
-tomli==2.2.1 ; python_version < "3.11"
+tomli==2.2.1
     # via
     #   pyproject-api
     #   tox
@@ -37,4 +37,6 @@ typing-extensions==4.12.2 ; python_version < "3.11"
     #   -c requirements/pins-typing.in
     #   tox
 virtualenv==20.29.0
-    # via tox
+    # via
+    #   -c requirements/pins-virtualenv-cve-2024-53899.in
+    #   tox

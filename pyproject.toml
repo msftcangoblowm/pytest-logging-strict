@@ -76,7 +76,10 @@ version = {attr = "pytest_logging_strict._version.__version__"}
 # Each venv relative path is predetermined
 # Into which venv goes which requirements is predetermined
 # TOML format, paths **must be** single quoted
-[[tool.venvs]]
+[tool.wreck]
+create_pins_unlock = false
+
+[[tool.wreck.venvs]]
 venv_base_path = '.venv'
 reqs = [
     'requirements/prod',
@@ -86,7 +89,7 @@ reqs = [
     'requirements/kit',
     'requirements/tox',
 ]
-[[tool.venvs]]
+[[tool.wreck.venvs]]
 venv_base_path = '.rst2html5'
 reqs = [
     'requirements/rst2html5',

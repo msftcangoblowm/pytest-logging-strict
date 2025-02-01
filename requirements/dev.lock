@@ -85,7 +85,7 @@ strictyaml==1.7.3
     # via
     #   -r requirements/prod.in
     #   logging-strict
-tomli==2.2.1 ; python_version < "3.11"
+tomli==2.2.1
     # via
     #   black
     #   blackdoc
