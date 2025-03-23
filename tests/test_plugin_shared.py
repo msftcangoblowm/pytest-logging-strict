@@ -6,7 +6,6 @@ WITHOUT using pytest-logging-strict, demonstrate fixture has_logging_occurred
 """
 
 import copy
-import os
 
 import pytest
 from logging_strict.tech_niques.stream_capture import CaptureOutput
@@ -47,7 +46,7 @@ def test_check_out(output, outcome_expected, line_count_expected, expected_captu
     str_out = cm.stdout
     assert outcome_actual is outcome_expected
 
-    lines_before = str_out.split(os.linesep)
+    lines_before = str_out.split("\n")
     lines_after = copy.deepcopy(lines_before)
     # remove empty lines
     idxs = []

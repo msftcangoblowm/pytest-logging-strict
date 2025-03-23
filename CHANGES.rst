@@ -18,6 +18,7 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
+   - tests: fix logging linesep same on Windows and posix
    - feat: add fixture has_logging_occurred
    - chore(pre-commit): add check typos
    - chore: update wreck support
