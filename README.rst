@@ -13,7 +13,7 @@ pytest fixture logging configured from packaged YAML
 
 **New in 0.2.x**
 
-registry implementation;
+registry implementation; add fixture has_logging_occurred;
 
 **New in 0.1.x**
 

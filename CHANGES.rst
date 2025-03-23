@@ -18,13 +18,18 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - tests: fix logging linesep same on Windows and posix
-   - feat: add fixture has_logging_occurred
-   - chore(pre-commit): add check typos
-   - chore: update wreck support
-   - ci: bump dependencies version
-
 .. scriv-start-here
+
+.. _changes_0-2-1:
+
+Version 0.2.1 — 2025-03-23
+--------------------------------
+
+- tests: fix logging linesep same on Windows and posix
+- feat: add fixture has_logging_occurred
+- chore(pre-commit): add check typos
+- chore: update wreck support
+- ci: bump dependencies version
 
 .. _changes_0-2-0:
 
