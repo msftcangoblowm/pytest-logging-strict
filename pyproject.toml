@@ -68,6 +68,7 @@ include = ["pytest_logging_strict*"]
 #              ``python -m pip install -U git+https://github.com/msftcangoblowm/logging-strict.git@a2026ea7f6984261bf34b7e4543088ad8aa0b7d4``
 #              ``python -m build`` then install local development build
 logging_strict = "pytest_logging_strict.plugin_wireframe"
+has_logging_occurred = "pytest_logging_strict.plugin_shared"
 
 [tool.setuptools.dynamic]
 dependencies = { file = ['requirements/prod.unlock'] }

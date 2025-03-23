@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 # underscore separated; aka sdist and whl names
 # https://blogs.gentoo.org/mgorny/2023/02/09/the-inconsistencies-around-python-package-naming-and-the-new-policy/
-APP_NAME := logging_strict
+APP_NAME := pytest_logging_strict
 
 define NORMALIZE_APP_NAME
 try:
@@ -38,11 +38,10 @@ ifeq ($(is_venv),1)
   is_wheel ?= $(call IS_PACKAGE,wheel)
   is_piptools ?= $(call IS_PACKAGE,pip-tools)
 
-  find_whl = $(shell [[ -z "$(3)" ]] && extention=".whl" || extention="$(3)"; [[ -z "$(2)" ]] && srcdir="dist" || srcdir="$(2)/dist"; [[ -z "$(1)" ]] && whl=$$(ls $$srcdir/$(APP_NAME)*.whl  --format="single-column") || whl=$$(ls $$srcdir/$(1)*.whl --format="single-column"); echo $${whl##*/})
+  find_whl = $(shell [[ -z "$(3)" ]] && extension=".whl" || extension="$(3)"; [[ -z "$(2)" ]] && srcdir="dist" || srcdir="$(2)/dist"; [[ -z "$(1)" ]] && whl=$$(ls $$srcdir/$(APP_NAME)*.whl  --format="single-column") || whl=$$(ls $$srcdir/$(1)*.whl --format="single-column"); echo $${whl##*/})
 endif
 
 ##@ Helpers
-
 
 # Original
 # https://www.thapaliya.com/en/writings/well-documented-makefiles/
@@ -56,7 +55,6 @@ help:					## (Default) Display this help -- Always up to date
 
 ##@ Testing
 
-
 #run all pre-commit checks
 .PHONY: pre-commit
 pre-commit:				## Run checks found in .pre-commit-config.yaml
@@ -64,13 +62,16 @@ ifeq ($(is_venv),1)
 	@pre-commit run --all-files
 endif
 
+
+##@ GNU Make standard targets
+
 # --cov-report=xml
 # Dependencies: pytest, pytest-cov, pytest-regressions
-# make [v=1] coverage
-# $(VENV_BIN)/pytest --showlocals --cov=wreck --cov-report=term-missing --cov-config=pyproject.toml $(verbose_text) tests
-.PHONY: coverage
-coverage: private verbose_text = $(if $(v),"--verbose")
-coverage:				## Run tests, generate coverage reports -- make [v=1] coverage
+# make [v=1] check
+# $(VENV_BIN)/pytest --showlocals --cov=pytest_logging_strict --cov-report=term-missing --cov-config=pyproject.toml $(verbose_text) tests
+.PHONY: check
+check: private verbose_text = $(if $(v),"--verbose")
+check:					## Run tests, generate coverage reports -- make [v=1] check
 ifeq ($(is_venv),1)
 	-@$(VENV_BIN_PYTHON) -m coverage erase
 	$(VENV_BIN_PYTHON) -m coverage run --parallel -m pytest --showlocals $(verbose_text) tests

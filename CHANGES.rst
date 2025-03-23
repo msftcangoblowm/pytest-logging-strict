@@ -10,7 +10,7 @@ Changelog
 
    - `rst2html5 alternative <https://github.com/marianoguerra/rst2html5/>`_
      Not maintained package. Would require forking and maintaining
-     In the interm, use docutils
+     In the interim, use docutils
 
    Known regressions
    ..................
@@ -18,6 +18,9 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
+   - feat: add fixture has_logging_occurred
+   - chore(pre-commit): add check typos
+   - chore: update wreck support
    - ci: bump dependencies version
 
 .. scriv-start-here

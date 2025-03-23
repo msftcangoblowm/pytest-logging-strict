@@ -200,12 +200,12 @@ def update_parser(parser: pytest.Parser):
     help_category = "Narrow down the search. Filter by process purpose"
     help_genre = (
         "Genre. If UI framework, examples: textual, rich. "
-        "For worker, e.g. mp (meaning multiprocessing). Preferrably one "
+        "For worker, e.g. mp (meaning multiprocessing). Preferably one "
         "word w/o hyphen periods or underscores"
     )
     help_flavor = (
         "Flavor (or name). Specific logging config serving a particular purpose. "
-        "Preferrably one word w/o hyphen periods or underscores"
+        "Preferably one word w/o hyphen periods or underscores"
     )
     help_version_no = (
         f"{target_file_desc} version. Flavor is optional, so applies "

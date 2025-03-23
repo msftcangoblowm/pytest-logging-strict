@@ -192,7 +192,7 @@ def _configure(config, xdist_worker_):
 
         """tempfile.NamedTemporaryFile temp folder is ``/tmp``.
         Instead use _pytest.tmpdir.TempPathFactory.getbasetemp which is
-        similiar to session scoped
+        similar to session scoped
 
         given_basetemp = None
         retention_count = 0

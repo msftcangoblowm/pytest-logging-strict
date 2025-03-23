@@ -348,7 +348,7 @@ ASK FOR HELP
 
 FOSS FUNDING
 
-- apply force and coersion to ensure maintanence continues. Funding
+- apply force and coercion to ensure maintenance continues. Funding
   should be unencumbered. This are accepted: monero or litecoin
 
 - fund travel to come out to speak at tech conferences (reside in West Japan)
@@ -360,10 +360,10 @@ FOSS FUNDING
 ASK FOR ABUSE
 
 - Throw shade, negativity, and FUD at everything and anything. Do it!
-  Will publically shame you into put your money where your mouth is.
+  Will publicly shame you into put your money where your mouth is.
 
 - pointless rambling and noise that leads no where. Will play spot the
-  pattern and respond with unpleasent truths, or worse, offensive memes
+  pattern and respond with unpleasant truths, or worse, offensive memes
 
 - Threaten to be useful or hold higher standing. e.g. recruiters or NPOs/NGOs
 

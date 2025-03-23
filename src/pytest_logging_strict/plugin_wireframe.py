@@ -64,6 +64,7 @@ def pytest_configure(config):
         get_qualname("impl_version_no"),
         IMPLEMENTATION_VERSION_NO_DEFAULT,
     )
+
     if impl_version == IMPLEMENTATION_VERSION_NO_DEFAULT:
         # latest implementation
         # change fixture variable scope from function --> global
