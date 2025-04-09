@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=70.0.0",
+    "setuptools>=77.0.3",
     "wheel",
     "build",
     "setuptools_scm>=8",
@@ -14,7 +14,11 @@ dynamic = [
     "dependencies",
     "version",
 ]
-license = {file = "LICENSE"}
+license = "AGPL-3.0-or-later"
+license-files = [
+    "LICEN[CS]E*",
+    "NOTICE*",
+]
 description = "pytest fixture logging configured from packaged YAML"
 keywords = [
     "pytest",
@@ -30,7 +34,6 @@ classifiers = [
     "Environment :: Console",
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",

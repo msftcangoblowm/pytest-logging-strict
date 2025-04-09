@@ -31,7 +31,7 @@ iniconfig==2.0.0
     # via pytest
 isort==5.13.2
     # via -r requirements/dev.in
-logging-strict==1.5.0
+logging-strict==1.6.0.post2
     # via -r requirements/prod.in
 markdown-it-py==3.0.0
     # via rich

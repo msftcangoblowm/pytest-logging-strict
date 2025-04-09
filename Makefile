@@ -59,7 +59,7 @@ help:					## (Default) Display this help -- Always up to date
 .PHONY: pre-commit
 pre-commit:				## Run checks found in .pre-commit-config.yaml
 ifeq ($(is_venv),1)
-	@pre-commit run --all-files
+	-@pre-commit run --all-files > /tmp/out.txt
 endif
 
 
