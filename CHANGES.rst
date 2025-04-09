@@ -18,11 +18,16 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - chore: pep639 compliance
-   - chore: bump logging-strict version
-   - ci: bump dependency version
-
 .. scriv-start-here
+
+.. _changes_0-2-2:
+
+Version 0.2.2 — 2025-04-09
+--------------------------------
+
+- chore: pep639 compliance
+- chore: bump logging-strict version
+- ci: bump dependency version
 
 .. _changes_0-2-1:
 
