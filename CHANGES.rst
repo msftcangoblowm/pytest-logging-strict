@@ -18,12 +18,17 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - fix(conftest): in clean environment pytest_report_header avoid import error
-   - tests: complete static typing
-   - chore: bump versions
-   - ci: bump versions
-
 .. scriv-start-here
+
+.. _changes_0-2-3:
+
+Version 0.2.3 — 2025-05-20
+--------------------------------
+
+- fix(conftest): in clean environment pytest_report_header avoid import error
+- tests: complete static typing
+- chore: bump versions
+- ci: bump versions
 
 .. _changes_0-2-2:
 
