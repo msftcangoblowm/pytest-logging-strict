@@ -5,6 +5,8 @@ Test utils introduced in impl_version_no 1
 
 """
 
+from __future__ import annotations
+
 import warnings
 from unittest.mock import patch
 
@@ -44,9 +46,9 @@ ids_get_query_v1 = (
     ids=ids_get_query_v1,
 )
 def test_get_query_v1(
-    query,
-    pytester,
-):
+    query: str,
+    pytester: pytest.Pytester,
+) -> None:
     """Test converting config into a v1 query"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_get_query_v1" tests
     config_text = (
@@ -78,8 +80,8 @@ def test_get_query_v1(
 
 
 def test_get_yaml_v1_extract(
-    pytester,
-):
+    pytester: pytest.Pytester,
+) -> None:
     """Test get_yaml_v1_extract"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_get_yaml_v1_extract" tests
     # prepare

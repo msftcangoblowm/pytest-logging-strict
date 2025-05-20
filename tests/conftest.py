@@ -5,7 +5,7 @@ Enable plugin pytester
 
 .. py:data:: pytest_plugins
    :type: str
-   :value: "pytester"
+   :value: ["pytester", "logging_strict"]
 
    pytest plugins to loader
 
@@ -20,9 +20,6 @@ Enable plugin pytester
 """
 
 import pytest
-from logging_strict._version import __version__ as ls_version
-
-from pytest_logging_strict._version import __version__ as pls_version
 
 pytest_plugins = [
     "pytester",
@@ -33,12 +30,22 @@ pytest_plugins = [
 def pytest_report_header() -> str:
     """Add package versioning info to pytest header
 
+    ``_version.py`` is not tracked in git. In a clean environment,
+    ``_version.py`` will not yet exist.
+
+    To create it, run :code:`python -m build`
+
     :returns: plugin or plugin dependencies versions
     :rtype: str
     """
-    ret = (
-        f"pytest-logging-strict: {pls_version} dependency logging-strict: {ls_version}"
-    )
+    try:
+        from logging_strict._version import __version__ as ls_version
+
+        from pytest_logging_strict._version import __version__ as pls_version
+    except ImportError:
+        ret = ""
+    else:
+        ret = f"pytest-logging-strict: {pls_version} dependency logging-strict: {ls_version}"
 
     return ret
 

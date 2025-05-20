@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: "Install Python"
-        uses: actions/setup-python@v5.5.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.9" # Minimum of PYVERSIONS
           # cache: pip
@@ -49,7 +49,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          python -m pip install -r requirements/tox$LOCK_SUFFIX -r requirements/prod$LOCK_SUFFIX -r requirements/kit$LOCK_SUFFIX
+          python -m pip install build wheel setuptools-scm -r requirements/tox$LOCK_SUFFIX -r requirements/prod$LOCK_SUFFIX
 
       # Create generated files: version file and .lnk files. sdist tarball ignored
       - name: "Build sdist to run plugins. Create generated files"
@@ -69,7 +69,7 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: "Install Python"
-        uses: actions/setup-python@v5.5.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.9" # Minimum of PYVERSIONS, but at least 3.9
           # cache: pip
@@ -80,7 +80,7 @@ jobs:
         run: |
           # Runs on 3.9, but hashes supported by pip-tools is
           # not supported by setuptools. So don't expect hashes
-          python -m pip install -r requirements/tox$LOCK_SUFFIX -r requirements/prod$LOCK_SUFFIX -r requirements/kit$LOCK_SUFFIX
+          python -m pip install build wheel setuptools-scm -r requirements/tox$LOCK_SUFFIX -r requirements/prod$LOCK_SUFFIX
 
       # Create generated files: version file and .lnk files. sdist tarball ignored
       - name: "Build sdist to run plugins. Create generated files"
@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: "Install Python"
-        uses: actions/setup-python@v5.5.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.10" # Minimum of PYVERSIONS
           # cache: pip

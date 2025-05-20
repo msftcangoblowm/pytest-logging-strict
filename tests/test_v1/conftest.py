@@ -9,7 +9,7 @@ import pytest
 
 
 @pytest.fixture(scope="session")
-def impl_version_no():
+def impl_version_no() -> str:
     """Plugin implementation version_no
 
     :returns: version no

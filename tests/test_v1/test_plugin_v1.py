@@ -25,20 +25,34 @@ In temp folder, 1st activate venv.
 
 """
 
+from __future__ import annotations
+
+import sys
 import warnings
 from contextlib import nullcontext as does_not_raise
 from pathlib import (
     Path,
     PurePath,
 )
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    cast,
+)
 from unittest.mock import patch
 
 import pytest
+from _pytest.python_api import RaisesContext
 
 from pytest_logging_strict.plugin_v1 import (
     RegistryPackageNameStash,
     RegistryPathStash,
 )
+
+if sys.version_info[:2] >= (3, 10):
+    from types import NoneType
+else:
+    NoneType = type(None)
 
 testdata_config_in_pyproject_toml = (
     (
@@ -126,23 +140,26 @@ ids_config_in_pyproject_toml = (
     ids=ids_config_in_pyproject_toml,
 )
 def test_fixture_logging_strict_v1(
-    package_name,
-    package_version,
-    yaml_package_name,
-    package_data_folder_start,
-    category,
-    genre,
-    flavor,
-    version_no,
-    dotted_path_handler_package_name,
-    expected_type,
-    msg,
-    pytester,
-    impl_version_no,
+    package_name: str,
+    package_version: str,
+    yaml_package_name: str,
+    package_data_folder_start: str,
+    category: str,
+    genre: str,
+    flavor: str,
+    version_no: str,
+    dotted_path_handler_package_name: str,
+    expected_type: str | None,
+    msg: str,
+    pytester: pytest.Pytester,
+    impl_version_no: str,
     # xdist_args,
-):
+) -> None:
     """Test logging_strict plugin"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_logging_strict_v1" tests
+    if TYPE_CHECKING:
+        kwargs: dict[str, Any]
+
     # prepare
     path_pytester = pytester.path  # noqa: F841
     #    pytest plugins (specified in ``conftest.py`` module variable, pytest_plugins)
@@ -310,23 +327,23 @@ ids_registry_package_path_stash = (
     ids=ids_registry_package_path_stash,
 )
 def test_registry_package_path_stash(
-    relpath_f,
-    datatype,
-    expectation,
-    relpath_expected,
-    tmp_path,
-):
+    relpath_f: str | float | None,
+    datatype: type,
+    expectation: does_not_raise[NoneType] | RaisesContext[BaseException],
+    relpath_expected: str | float | None,
+    tmp_path: Path,
+) -> None:
     """Serialized/deserialize a path"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_registry_package_path_stash" tests
 
     if datatype == str:
-        abspath_f = tmp_path.joinpath(relpath_f)
+        abspath_f = tmp_path.joinpath(cast("str", relpath_f))
         f_abspath = str(abspath_f)
     elif issubclass(datatype, PurePath):
-        abspath_f = tmp_path.joinpath(relpath_f)
-        f_abspath = abspath_f
+        abspath_f = tmp_path.joinpath(cast("Path", relpath_f))
+        f_abspath = abspath_f.as_posix()
     else:
-        f_abspath = relpath_f
+        f_abspath = relpath_f  # type: ignore[assignment]
 
     with expectation:
         cs = RegistryPathStash.from_serialized(f_abspath)
@@ -383,10 +400,10 @@ id_registry_package_name_stash = (
     ids=id_registry_package_name_stash,
 )
 def test_registry_package_name_stash(
-    package_name,
-    expectation,
-    package_name_expected,
-):
+    package_name: str | float | None,
+    expectation: does_not_raise[NoneType],
+    package_name_expected: str | None,
+) -> None:
     """Test RegistryPackageNameStash"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_registry_package_name_stash" tests
     with expectation:
@@ -423,10 +440,10 @@ ids_configure = (
     ids=ids_configure,
 )
 def test_configure_v1(
-    get_yaml_return_value,
-    is_xdist_plugin_on,
+    get_yaml_return_value: str | None,
+    is_xdist_plugin_on: bool,
     pytester: pytest.Pytester,
-):
+) -> None:
     """Test pytest_configure hook"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_configure_v1" tests
     from pytest_logging_strict.plugin_wireframe import pytest_configure as configure

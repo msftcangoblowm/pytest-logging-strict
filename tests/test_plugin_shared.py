@@ -6,6 +6,11 @@ WITHOUT using pytest-logging-strict, demonstrate fixture has_logging_occurred
 """
 
 import copy
+from collections.abc import Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+)
 
 import pytest
 from logging_strict.tech_niques.stream_capture import CaptureOutput
@@ -38,7 +43,12 @@ ids_check_out = (
     testdata_check_out,
     ids=ids_check_out,
 )
-def test_check_out(output, outcome_expected, line_count_expected, expected_capture):
+def test_check_out(
+    output: Sequence[str],
+    outcome_expected: bool,
+    line_count_expected: int,
+    expected_capture: Sequence[str],
+) -> None:
     """Testable guts of fixture has_logging_occurred"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_check_out" tests
     with CaptureOutput() as cm:
@@ -70,9 +80,12 @@ def test_check_out(output, outcome_expected, line_count_expected, expected_captu
             pytest.xfail(reason)
 
 
-def test_fixture_has_logging_occurred(pytester):
+def test_fixture_has_logging_occurred(pytester: pytest.Pytester) -> None:
     """Minimal detect logging occurred example"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_has_logging_occurred" tests
+    if TYPE_CHECKING:
+        kwargs: dict[str, Any]
+
     path_pytester = pytester.path  # noqa: F841
     lst_plugins = pytester.plugins  # noqa: F841
     name = "test_has_logging_occurred"

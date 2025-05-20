@@ -9,9 +9,12 @@ Test module pytest_logging_strict.util
 
 """
 
+from __future__ import annotations
+
 import warnings
 from fnmatch import fnmatch
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -120,17 +123,17 @@ ids_get_yaml_v0 = (
     ids=ids_get_yaml_v0,
 )
 def test_get_yaml_v0(
-    yaml_package_name,
-    package_data_folder_start,
-    category,
-    genre,
-    flavor,
-    version_no,
-    return_type,
-    warning_msg,
+    yaml_package_name: str,
+    package_data_folder_start: str,
+    category: str,
+    genre: str,
+    flavor: str,
+    version_no: str,
+    return_type: type | None,
+    warning_msg: str | None,
     pytester: pytest.Pytester,
-    impl_version_no,
-):
+    impl_version_no: str,
+) -> None:
     """Call pytest_addoption to test util module"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_get_yaml_v0" tests
     path_pytester = pytester.path  # noqa: F841
@@ -180,8 +183,13 @@ def test_get_yaml_v0(
         if len(w) == 1:
             assert issubclass(w[-1].category, UserWarning)
             msg_actual = str(w[-1].message)
-            is_match = fnmatch(msg_actual, warning_msg)
-            assert is_match
+            if msg_actual is None and warning_msg is None:
+                is_match = True
+            else:
+                str_msg_actual = cast("str", msg_actual)
+                str_warning_msg = cast("str", warning_msg)
+                is_match = fnmatch(str_msg_actual, str_warning_msg)
+                assert is_match
 
     if return_type is None:
         assert out_actual is None

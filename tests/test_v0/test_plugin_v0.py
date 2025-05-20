@@ -25,15 +25,29 @@ In temp folder, 1st activate venv.
 
 """
 
+from __future__ import annotations
+
+import sys
 import warnings
 from contextlib import nullcontext as does_not_raise
 from pathlib import (
     Path,
     PurePath,
 )
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    cast,
+)
 from unittest.mock import patch
 
 import pytest
+from _pytest.python_api import RaisesContext
+
+if sys.version_info[:2] >= (3, 10):
+    from types import NoneType
+else:
+    NoneType = type(None)
 
 testdata_config_in_pyproject_toml = (
     (
@@ -121,23 +135,26 @@ ids_config_in_pyproject_toml = (
     ids=ids_config_in_pyproject_toml,
 )
 def test_fixture_logging_strict_v0(
-    package_name,
-    package_version,
-    yaml_package_name,
-    package_data_folder_start,
-    category,
-    genre,
-    flavor,
-    version_no,
-    dotted_path_handler_package_name,
-    expected_type,
-    msg,
-    pytester,
-    impl_version_no,
+    package_name: str,
+    package_version: str,
+    yaml_package_name: str,
+    package_data_folder_start: str,
+    category: str,
+    genre: str,
+    flavor: str,
+    version_no: str,
+    dotted_path_handler_package_name: str | None,
+    expected_type: str | None,
+    msg: str,
+    pytester: pytest.Pytester,
+    impl_version_no: str,
     # xdist_args,
 ):
     """Test logging_strict plugin"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_logging_strict_v0" tests
+    if TYPE_CHECKING:
+        kwargs: dict[str, Any]
+
     # prepare
     path_pytester = pytester.path  # noqa: F841
     #    pytest plugins (specified in ``conftest.py`` module variable, pytest_plugins)
@@ -298,24 +315,24 @@ ids_config_stash_dataclass = (
     ids=ids_config_stash_dataclass,
 )
 def test_config_stash_dataclass(
-    relpath_f,
-    datatype,
-    expectation,
-    relpath_expected,
-    tmp_path,
-):
+    relpath_f: str | float,
+    datatype: type,
+    expectation: does_not_raise[NoneType] | RaisesContext[BaseException],
+    relpath_expected: str | float,
+    tmp_path: Path,
+) -> None:
     """Serialized/deserialize a path"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_config_stash_dataclass" tests
     from pytest_logging_strict.plugin_v0 import LSConfigStash
 
     if datatype == str:
-        abspath_f = tmp_path.joinpath(relpath_f)
+        abspath_f = tmp_path.joinpath(cast("str", relpath_f))
         f_abspath = str(abspath_f)
     elif issubclass(datatype, PurePath):
-        abspath_f = tmp_path.joinpath(relpath_f)
-        f_abspath = abspath_f
+        abspath_f = tmp_path.joinpath(cast("Path", relpath_f))
+        f_abspath = abspath_f.as_posix()
     else:
-        f_abspath = relpath_f
+        f_abspath = relpath_f  # type: ignore[assignment]
 
     with expectation:
         cs = LSConfigStash.from_serialized(f_abspath)
@@ -354,11 +371,11 @@ ids_configure = (
     ids=ids_configure,
 )
 def test_configure_v0(
-    get_yaml_return_value,
-    is_xdist_plugin_on,
+    get_yaml_return_value: str | None,
+    is_xdist_plugin_on: bool,
     pytester: pytest.Pytester,
-    impl_version_no,
-):
+    impl_version_no: str,
+) -> None:
     """Test pytest_configure hook"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_configure_v0" tests
 
@@ -431,22 +448,25 @@ def test_configure_v0(
     ids=ids_config_in_pyproject_toml,
 )
 def test_fixture_get_d_config(
-    package_name,
-    package_version,
-    yaml_package_name,
-    package_data_folder_start,
-    category,
-    genre,
-    flavor,
-    version_no,
-    dotted_path_handler_package_name,
-    expected_type,
-    msg,
-    pytester,
-    impl_version_no,
+    package_name: str,
+    package_version: str,
+    yaml_package_name: str,
+    package_data_folder_start: str,
+    category: str,
+    genre: str,
+    flavor: str,
+    version_no: str,
+    dotted_path_handler_package_name: str | None,
+    expected_type: str | None,
+    msg: str,
+    pytester: pytest.Pytester,
+    impl_version_no: str,
 ):
     """Run fixture get_d_config inprocess"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_get_d_config" tests
+    if TYPE_CHECKING:
+        kwargs_1: dict[str, Any]
+
     config_text = (
         "[build-system]\n"
         "requires = [\n"
@@ -488,10 +508,10 @@ def test_fixture_get_d_config(
     pytester.makeconftest(conftest_text)
 
     #    no pyproject.toml nor cli
-    args = ()
+    args_0 = ()
     with warnings.catch_warnings(record=False):
         warnings.simplefilter(action="ignore", category=UserWarning)
-        config = pytester.parseconfig(*args)
+        config = pytester.parseconfig(*args_0)
 
     #    pre-extracted logging strict YAML file
     path_f = Path(__file__).parent.parent.joinpath(
@@ -534,9 +554,9 @@ def test_fixture_get_d_config(
                 configure(config)
 
                 # run inline not within a subprocess
-                args = ("--showlocals", "-vv", f"{name}.py")
-                kwargs = {}
-                run_result = pytester.runpytest_inprocess(*args, **kwargs)
+                args_1 = ("--showlocals", "-vv", f"{name}.py")
+                kwargs_1 = {}
+                run_result = pytester.runpytest_inprocess(*args_1, **kwargs_1)
                 out = run_result.outlines  # noqa: F841
                 err = run_result.errlines  # noqa: F841
                 outcomes = run_result.parseoutcomes()  # noqa: F841

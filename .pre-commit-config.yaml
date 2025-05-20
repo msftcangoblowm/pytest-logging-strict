@@ -60,7 +60,7 @@ repos:
   hooks:
   - id: mypy
     pass_filenames: false
-    entry: mypy src/pytest_logging_strict/
+    entry: mypy src/pytest_logging_strict/ tests/
 
 - repo: https://github.com/econchick/interrogate
   rev: 1.7.0  # or master if you're bold

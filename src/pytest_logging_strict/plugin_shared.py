@@ -9,26 +9,47 @@
    handlers package name
 """
 
+from collections.abc import (
+    Callable,
+    Sequence,
+)
+
 import pytest
 
 item_marker = "logging_package_name"
 
 
-def _check_out(output: list[str]) -> bool:
-    """Separated to be testable and without printing a header line"""
-    if output == [""]:
-        print("Nothing captured")
-        ret = False
+def _check_out(output: Sequence[str]) -> bool:
+    """Separated to be testable and without printing a header line
+
+    :param output: log entries
+    :type output: collections.abc.Sequence[str]
+    :returns: True has log entries otherwise False
+    :rtype: bool
+    """
+    is_seq = (
+        output is not None
+        and isinstance(output, Sequence)
+        and not isinstance(output, str)
+    )
+    if is_seq:
+        if len(output) == 1 and not bool(output[0]):
+            # [""]
+            print("Nothing captured")
+            ret = False
+        else:
+            seq_len = len(output)
+            for i in range(seq_len):
+                print(f"{i}: {output[i]}")
+            ret = True
     else:
-        for i in range(len(output)):
-            print(f"{i}: {output[i]}")
-        ret = True
+        ret = False
 
     return ret
 
 
 @pytest.fixture()
-def has_logging_occurred(caplog: pytest.LogCaptureFixture) -> bool:
+def has_logging_occurred(caplog: pytest.LogCaptureFixture) -> Callable[[], bool]:
     """Display caplog capture text.
 
     Usage

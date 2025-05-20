@@ -44,3 +44,5 @@ src/logging_strict/_version.py
 docs/_build/
 .doc
 .venv
+
+src/pytest_logging_strict/_version.py

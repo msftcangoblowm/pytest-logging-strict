@@ -1,9 +1,9 @@
 [build-system]
 requires = [
-    "setuptools>=77.0.3",
+    "setuptools>=80.7.1",
     "wheel",
     "build",
-    "setuptools_scm>=8",
+    "setuptools-scm>=8.3.1",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -50,6 +50,9 @@ classifiers = [
 ]
 # Contact by mastodon please
 authors = [
+    {name = "Dave Faulkmore", email = "faulkmore@protonmail.com"},
+]
+maintainers = [
     {name = "Dave Faulkmore", email = "faulkmore@protonmail.com"},
 ]
 
@@ -173,3 +176,9 @@ skip_covered = true
 skip_empty = true
 fail_under = 68
 show_missing = true
+
+[tool.setuptools_scm]
+# can be empty if no extra settings are needed, presence enables setuptools_scm
+# SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYTEST_LOGGING_STRICT="0.0.1" python -m setuptools_scm
+# fallback_version = "0.0.1"
+version_file = "src/pytest_logging_strict/_version.py"
