@@ -1,6 +1,6 @@
 importlib-metadata==8.7.0
     # via build
-packaging==26.2
+packaging==26.3
     # via build
 pyproject-hooks==1.2.0
     # via build

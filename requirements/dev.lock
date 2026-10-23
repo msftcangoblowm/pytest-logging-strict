@@ -39,7 +39,7 @@ mccabe==0.7.0
     # via flake8
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.6.0
+more-itertools==10.7.0
     # via blackdoc
 mypy==1.15.0
     # via -r requirements/mypy.in
@@ -47,11 +47,11 @@ mypy-extensions==1.0.0
     # via
     #   black
     #   mypy
-packaging==26.2
+packaging==26.3
     # via
     #   black
     #   pytest
-pathspec==0.12.1
+pathspec==1.1.1
     # via
     #   black
     #   blackdoc

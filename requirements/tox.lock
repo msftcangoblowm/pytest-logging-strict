@@ -10,7 +10,7 @@ filelock==4.1.0
     # via
     #   tox
     #   virtualenv
-packaging==26.2
+packaging==26.3
     # via
     #   pyproject-api
     #   tox
@@ -21,6 +21,8 @@ platformdirs==4.9.6
 pluggy==1.6.0
     # via tox
 pyproject-api==1.10.0
+    # via tox
+python-discovery==1.6.4
     # via tox
 tox==4.53.1
     # via

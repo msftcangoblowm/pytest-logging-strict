@@ -60,7 +60,7 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - fix: virtualenv conflict with tox
+   - fix: virtualenv conflict with distlib tox packaging
    - chore: drop py39 py310
    - ci: bump versions
    - tests: pytest.mark.parametrize decorator testcases use pytest.param
