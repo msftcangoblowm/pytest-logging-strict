@@ -6,9 +6,9 @@ exceptiongroup==1.2.2
     # via pytest
 iniconfig==2.0.0
     # via pytest
-logging-strict==1.6.1
+logging-strict==1.7.2.post1
     # via -r requirements/prod.in
-packaging==25.0
+packaging==26.2
     # via pytest
 pluggy==1.6.0
     # via pytest
@@ -23,12 +23,4 @@ six==1.17.0
 strictyaml==1.7.3
     # via
     #   -r requirements/prod.in
-    #   logging-strict
-tomli==2.2.1 ; python_version < "3.11"
-    # via
-    #   logging-strict
-    #   pytest
-typing-extensions==4.12.2 ; python_version < "3.11"
-    # via
-    #   -c requirements/pins-typing.in
     #   logging-strict

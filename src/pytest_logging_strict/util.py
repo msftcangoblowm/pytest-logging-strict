@@ -9,12 +9,6 @@ As much as possible, into a separate module, separate out imports to logging_str
 
    Module exports
 
-.. py:data:: IMPLEMENTATION_VERSION_NO_DEFAULT
-   :type: str
-   :value: "1"
-
-   Fallback plugin implementation version no
-
 """
 
 from __future__ import annotations
@@ -41,9 +35,13 @@ __all__ = (
     "update_parser",
 )
 
+#: str: valid app name uses underscores (and/or period)
 APP_NAME_TOKEN = "logging_strict"
+#: str: likely package or entrypoint name
 CLI_NAME_TOKEN = "logging-strict"
+#: str: Fallback plugin implementation version no
 IMPLEMENTATION_VERSION_NO_DEFAULT = "1"
+#: str: needs underscore, not hyphen
 IMPLEMENTATION_PACKAGE_NAME = APP_NAME_TOKEN
 
 

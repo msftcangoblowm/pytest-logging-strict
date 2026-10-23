@@ -8,6 +8,48 @@ Changelog
    Feature request
    .................
 
+   - ``*.logging.config.yaml`` exported to ``/tmp`` when test run.
+     Eventhough already **modified version** exists within ``~/.local/share/``
+
+     **Reproduce**
+
+     ``pyproject.toml``
+
+     .. code-block:: text
+
+        [tool.pytest.ini_options]
+        logging_strict_yaml_package_name = 'sqa_cf'
+        logging_strict_package_data_folder_start = 'configs'
+        logging_strict_category = 'worker'
+        logging_strict_genre = 'mp'
+        logging_strict_flavor = 'sqacf'
+        logging_strict_version_no = '1'
+
+    ``tests/conftest.py``
+
+    .. code-block:: text
+
+       pytest_plugins = [
+           "logging_strict",
+           "has_logging_occurred",
+           "sqa_cf",
+       ]
+
+     :code:`@pytest.mark.logging_package_name("sqa_cf")`
+
+     ``mp_1_sqacf.worker.logging.config.yaml`` exists in ``~/.local/share/``
+     run pytest copies to ``/tmp`` why? Already exists in ``~/.local/share/``
+
+     .. code-block:: shell
+
+        cd curatables
+        . .venv/bin/activate
+        pytest -vv --showlocals --log-level INFO -k "test_models_crud" tests
+
+    Look in folders ``/tmp`` and ``~/.local/share/``
+
+    Document situation so others can troubleshoot similar situation
+
    - `rst2html5 alternative <https://github.com/marianoguerra/rst2html5/>`_
      Not maintained package. Would require forking and maintaining
      In the interim, use docutils
@@ -17,6 +59,10 @@ Changelog
 
    Commit items for NEXT VERSION
    ..............................
+
+   - chore: drop py39 py310
+   - ci: bump versions
+   - tests: pytest.mark.parametrize decorator testcases use pytest.param
 
 .. scriv-start-here
 

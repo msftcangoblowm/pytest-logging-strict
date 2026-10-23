@@ -3,14 +3,16 @@
 
 WITHOUT using pytest-logging-strict, demonstrate fixture has_logging_occurred
 
+Without coverage
+
+.. code-block:: shell
+
+   python -m pytest -vv --showlocals tests/test_plugin_shared.py
+
 """
 
 import copy
-from collections.abc import Sequence
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import pytest
 from logging_strict.tech_niques.stream_capture import CaptureOutput
@@ -18,36 +20,35 @@ from logging_strict.util.check_type import is_not_ok
 
 from pytest_logging_strict.plugin_shared import _check_out
 
-testdata_check_out = (
-    (
-        [""],
-        False,
-        1,
-        ["Nothing captured"],
-    ),
-    (
-        ["Hello World", "Thanks for all the fish"],
-        True,
-        2,
-        ["Hello World", "Thanks for all the fish"],
-    ),
-)
-ids_check_out = (
-    "no output",
-    "two lines of output",
-)
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from typing import Any
 
 
 @pytest.mark.parametrize(
     "output, outcome_expected, line_count_expected, expected_capture",
-    testdata_check_out,
-    ids=ids_check_out,
+    (
+        pytest.param(
+            [""],
+            False,
+            1,
+            ["Nothing captured"],
+            id="no-output",
+        ),
+        pytest.param(
+            ["Hello World", "Thanks for all the fish"],
+            True,
+            2,
+            ["Hello World", "Thanks for all the fish"],
+            id="two-lines-of-output",
+        ),
+    ),
 )
 def test_check_out(
-    output: Sequence[str],
+    output: "Sequence[str]",
     outcome_expected: bool,
     line_count_expected: int,
-    expected_capture: Sequence[str],
+    expected_capture: "Sequence[str]",
 ) -> None:
     """Testable guts of fixture has_logging_occurred"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_check_out" tests
@@ -59,10 +60,7 @@ def test_check_out(
     lines_before = str_out.split("\n")
     lines_after = copy.deepcopy(lines_before)
     # remove empty lines
-    idxs = []
-    for idx, line in enumerate(lines_before):
-        if is_not_ok(line):
-            idxs.append(idx)
+    idxs = [idx for idx, line in enumerate(lines_before) if is_not_ok(line)]
     for idx in reversed(idxs):
         del lines_after[idx]
     line_count_actual = len(lines_after)

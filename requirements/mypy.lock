@@ -8,7 +8,7 @@ mypy==1.15.0
     # via -r requirements/mypy.in
 mypy-extensions==1.0.0
     # via mypy
-packaging==25.0
+packaging==26.2
     # via pytest
 pluggy==1.6.0
     # via pytest
@@ -16,11 +16,3 @@ pytest==8.3.4
     # via pytest-xdist
 pytest-xdist==3.6.1
     # via -r requirements/mypy.in
-tomli==2.2.1 ; python_version < "3.11"
-    # via
-    #   mypy
-    #   pytest
-typing-extensions==4.12.2 ; python_version < "3.11"
-    # via
-    #   -c requirements/pins-typing.in
-    #   mypy

@@ -27,7 +27,6 @@ In temp folder, 1st activate venv.
 
 from __future__ import annotations
 
-import sys
 import warnings
 from contextlib import nullcontext as does_not_raise
 from pathlib import (
@@ -36,98 +35,21 @@ from pathlib import (
 )
 from typing import (
     TYPE_CHECKING,
-    Any,
     cast,
 )
 from unittest.mock import patch
 
 import pytest
-from _pytest.python_api import RaisesContext
 
 from pytest_logging_strict.plugin_v1 import (
     RegistryPackageNameStash,
     RegistryPathStash,
 )
 
-if sys.version_info[:2] >= (3, 10):
-    from types import NoneType
-else:
-    NoneType = type(None)
+if TYPE_CHECKING:
+    from typing import Any
 
-testdata_config_in_pyproject_toml = (
-    (
-        "awesomepackage",
-        "0.0.1",
-        "logging_strict",
-        "configs",
-        "worker",
-        "mp",
-        "asz",
-        "1",
-        "asz",
-        None,
-        """log this important message""",
-    ),
-    (
-        "awesomepackage",
-        "0.0.1",
-        "coverage",
-        "configs",
-        "worker",
-        "mp",
-        "asz",
-        "1",
-        "asz",
-        None,
-        """log this important message""",
-    ),
-    (
-        "awesomepackage",
-        "0.0.1",
-        "logging_strict",
-        "configs",
-        "worker",
-        "mp",
-        "asz",
-        "1",
-        "logging_strict",
-        "Logger",
-        """log this important message""",
-    ),
-    (
-        "awesomepackage",
-        "0.0.1",
-        "logging_strict",
-        "configs",
-        "worker",
-        "mp",
-        "asz",
-        "1",
-        None,
-        "Logger",
-        """log this important message""",
-    ),
-    (
-        "awesomepackage",
-        "0.0.1",
-        "logassert",
-        "configs",
-        "worker",
-        "mp",
-        "asz",
-        "1",
-        "logassert",
-        None,
-        """log this important message""",
-    ),
-)
-ids_config_in_pyproject_toml = (
-    "loggers.asz successful extract logging config YAML",
-    "Unsuccessful search. Package data lacks logging config YAML files",
-    "loggers.logging_strict",
-    "get root logger",
-    "logassert not installed in venv becomes ImportError",
-)
+    from .typing_only import DOES_NOT_OR_DOES
 
 
 @pytest.mark.parametrize(
@@ -136,8 +58,78 @@ ids_config_in_pyproject_toml = (
         "package_data_folder_start, category, genre, flavor, version_no, "
         "dotted_path_handler_package_name, expected_type, msg"
     ),
-    testdata_config_in_pyproject_toml,
-    ids=ids_config_in_pyproject_toml,
+    (
+        pytest.param(
+            "awesomepackage",
+            "0.0.1",
+            "logging_strict",
+            "configs",
+            "worker",
+            "mp",
+            "asz",
+            "1",
+            "asz",
+            None,
+            """log this important message""",
+            id="loggers.asz-successful-extract-logging-config-YAML",
+        ),
+        pytest.param(
+            "awesomepackage",
+            "0.0.1",
+            "coverage",
+            "configs",
+            "worker",
+            "mp",
+            "asz",
+            "1",
+            "asz",
+            None,
+            """log this important message""",
+            id="Unsuccessful-search.-Package-data-lacks-logging-config-YAML-files",
+        ),
+        pytest.param(
+            "awesomepackage",
+            "0.0.1",
+            "logging_strict",
+            "configs",
+            "worker",
+            "mp",
+            "asz",
+            "1",
+            "logging_strict",
+            "Logger",
+            """log this important message""",
+            id="loggers.logging_strict",
+        ),
+        pytest.param(
+            "awesomepackage",
+            "0.0.1",
+            "logging_strict",
+            "configs",
+            "worker",
+            "mp",
+            "asz",
+            "1",
+            None,
+            "Logger",
+            """log this important message""",
+            id="get-root-logger",
+        ),
+        pytest.param(
+            "awesomepackage",
+            "0.0.1",
+            "logassert",
+            "configs",
+            "worker",
+            "mp",
+            "asz",
+            "1",
+            "logassert",
+            None,
+            """log this important message""",
+            id="logassert-not-installed-in-venv-becomes-ImportError",
+        ),
+    ),
 )
 def test_fixture_logging_strict_v1(
     package_name: str,
@@ -154,12 +146,14 @@ def test_fixture_logging_strict_v1(
     pytester: pytest.Pytester,
     impl_version_no: str,
     # xdist_args,
+    request: "pytest.FixtureRequest",
 ) -> None:
     """Test logging_strict plugin"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_logging_strict_v1" tests
     if TYPE_CHECKING:
         kwargs: dict[str, Any]
 
+    abspath_tests_dir = request.path.parent.parent
     # prepare
     path_pytester = pytester.path  # noqa: F841
     #    pytest plugins (specified in ``conftest.py`` module variable, pytest_plugins)
@@ -191,8 +185,7 @@ def test_fixture_logging_strict_v1(
     pytester.makepyprojecttoml(config_text)
 
     #    conftest.py
-    path_src = Path(__file__).parent.parent.joinpath("conftest.py")
-    conftest_text = path_src.read_text()
+    conftest_text = abspath_tests_dir.joinpath("conftest.py").read_text()
     pytester.makeconftest(conftest_text)
 
     #    a test file
@@ -287,49 +280,43 @@ def test_fixture_logging_strict_v1(
     assert exit_code == 0
 
 
-testdata_registry_package_path_stash = (
-    (
-        "deleteme.logging.config.yaml",
-        str,
-        does_not_raise(),
-        "deleteme.logging.config.yaml",
-    ),
-    (
-        "deleteme.logging.config.yaml",
-        Path,
-        does_not_raise(),
-        "deleteme.logging.config.yaml",
-    ),
-    (
-        0.2345,
-        float,
-        pytest.raises(TypeError),
-        0.2345,
-    ),
-    (
-        None,
-        type(None),
-        does_not_raise(),
-        None,
-    ),
-)
-ids_registry_package_path_stash = (
-    "path",
-    "Path",
-    "float",
-    "None",
-)
-
-
 @pytest.mark.parametrize(
     "relpath_f, datatype, expectation, relpath_expected",
-    testdata_registry_package_path_stash,
-    ids=ids_registry_package_path_stash,
+    (
+        pytest.param(
+            "deleteme.logging.config.yaml",
+            str,
+            does_not_raise(),
+            "deleteme.logging.config.yaml",
+            id="path",
+        ),
+        pytest.param(
+            "deleteme.logging.config.yaml",
+            Path,
+            does_not_raise(),
+            "deleteme.logging.config.yaml",
+            id="Path",
+        ),
+        pytest.param(
+            0.2345,
+            float,
+            pytest.raises(TypeError),
+            0.2345,
+            id="float",
+        ),
+        pytest.param(
+            None,
+            type(None),
+            does_not_raise(),
+            None,
+            id="None",
+        ),
+    ),
 )
 def test_registry_package_path_stash(
     relpath_f: str | float | None,
     datatype: type,
-    expectation: does_not_raise[NoneType] | RaisesContext[BaseException],
+    expectation: "DOES_NOT_OR_DOES",
     relpath_expected: str | float | None,
     tmp_path: Path,
 ) -> None:
@@ -358,50 +345,44 @@ def test_registry_package_path_stash(
             assert f_relpath_actual == f_relpath_expected
 
 
-testdata_registry_package_name_stash = (
-    (
-        "logging-strict",
-        does_not_raise(),
-        "logging_strict",
-    ),
-    (
-        "zope.interface",
-        does_not_raise(),
-        "zope.interface",
-    ),
-    (
-        0.12345,
-        does_not_raise(),
-        None,
-    ),
-    (
-        None,
-        does_not_raise(),
-        None,
-    ),
-    (
-        "   ",
-        does_not_raise(),
-        None,
-    ),
-)
-id_registry_package_name_stash = (
-    "package name contains hyphen",
-    "package name contains period",
-    "unsupported type becomes None no exception",
-    "None becomes None no exception",
-    "whitespace becomes None no exception",
-)
-
-
 @pytest.mark.parametrize(
     "package_name, expectation, package_name_expected",
-    testdata_registry_package_name_stash,
-    ids=id_registry_package_name_stash,
+    (
+        pytest.param(
+            "logging-strict",
+            does_not_raise(),
+            "logging_strict",
+            id="package-name-contains-hyphen",
+        ),
+        pytest.param(
+            "zope.interface",
+            does_not_raise(),
+            "zope.interface",
+            id="package-name-contains-period",
+        ),
+        pytest.param(
+            0.12345,
+            does_not_raise(),
+            None,
+            id="unsupported-type-becomes-None-no-exception",
+        ),
+        pytest.param(
+            None,
+            does_not_raise(),
+            None,
+            id="None-becomes-None-no-exception",
+        ),
+        pytest.param(
+            "   ",
+            does_not_raise(),
+            None,
+            id="whitespace-becomes-None-no-exception",
+        ),
+    ),
 )
 def test_registry_package_name_stash(
     package_name: str | float | None,
-    expectation: does_not_raise[NoneType],
+    expectation: "DOES_NOT_OR_DOES",
     package_name_expected: str | None,
 ) -> None:
     """Test RegistryPackageNameStash"""
@@ -413,31 +394,25 @@ def test_registry_package_name_stash(
         assert package_name_actual == package_name_expected
 
 
-testdata_configure = (
-    (
-        "write this to file",
-        True,
-    ),
-    (
-        "write this to file",
-        False,
-    ),
-    (
-        None,
-        True,
-    ),
-)
-ids_configure = (
-    "str_yaml extracts a str xdist on",
-    "str_yaml extracts a str xdist off",
-    "str_yaml extraction fails None",
-)
-
-
 @pytest.mark.parametrize(
     "get_yaml_return_value, is_xdist_plugin_on",
-    testdata_configure,
-    ids=ids_configure,
+    (
+        pytest.param(
+            "write this to file",
+            True,
+            id="str_yaml-extracts-a-str-xdist-on",
+        ),
+        pytest.param(
+            "write this to file",
+            False,
+            id="str_yaml-extracts-a-str-xdist-off",
+        ),
+        pytest.param(
+            None,
+            True,
+            id="str_yaml-extraction-fails-None",
+        ),
+    ),
 )
 def test_configure_v1(
     get_yaml_return_value: str | None,

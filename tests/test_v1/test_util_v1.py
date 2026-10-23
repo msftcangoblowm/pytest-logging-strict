@@ -3,6 +3,12 @@
 
 Test utils introduced in impl_version_no 1
 
+Without coverage
+
+.. code-block:: shell
+
+   pytest --showlocals -vv tests/test_v1/test_util_v1.py
+
 """
 
 from __future__ import annotations
@@ -17,33 +23,32 @@ from pytest_logging_strict.util import (
     get_yaml_v1_extract,
 )
 
-testdata_get_query_v1 = (
-    (
-        """logging_strict_impl_version_no = "1"\n"""
-        """logging_strict_yaml_package_name = 'logging-strict'\n"""
-        """logging_strict_category = 'worker'\n"""
-        """logging_strict_genre = 'mp'\n"""
-        """logging_strict_flavor = 'asz'\n"""
-        """logging_strict_version_no = '1'\n"""
-    ),
-    (
-        """logging_strict_yaml_package_name = 'logging-strict'\n"""
-        """logging_strict_category = 'worker'\n"""
-        """logging_strict_genre = 'mp'\n"""
-        """logging_strict_flavor = 'asz'\n"""
-        """logging_strict_version_no = '1'\n"""
-    ),
-)
-ids_get_query_v1 = (
-    "with impl_version_no provided",
-    "without impl_version_no",
-)
-
 
 @pytest.mark.parametrize(
     "query",
-    testdata_get_query_v1,
-    ids=ids_get_query_v1,
+    (
+        pytest.param(
+            (
+                """logging_strict_impl_version_no = "1"\n"""
+                """logging_strict_yaml_package_name = 'logging-strict'\n"""
+                """logging_strict_category = 'worker'\n"""
+                """logging_strict_genre = 'mp'\n"""
+                """logging_strict_flavor = 'asz'\n"""
+                """logging_strict_version_no = '1'\n"""
+            ),
+            id="with-impl_version_no-provided",
+        ),
+        pytest.param(
+            (
+                """logging_strict_yaml_package_name = 'logging-strict'\n"""
+                """logging_strict_category = 'worker'\n"""
+                """logging_strict_genre = 'mp'\n"""
+                """logging_strict_flavor = 'asz'\n"""
+                """logging_strict_version_no = '1'\n"""
+            ),
+            id="without-impl_version_no",
+        ),
+    ),
 )
 def test_get_query_v1(
     query: str,

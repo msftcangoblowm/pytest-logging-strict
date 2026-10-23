@@ -3,13 +3,16 @@ pytest-logging-strict
 
 pytest fixture logging configured from packaged YAML
 
-|  |kit| |license| |versions|
-|  |test-status| |codecov| |quality-status|
-|  |stars| |mastodon-msftcangoblowm|
+|  |kit| |codecov| |license|
+|  |last-commit| |quality-status|
+|  |platforms| |test-status| |versions|
+|  |implementations| |black|
+|  |downloads| |stars|
+|  |mastodon-msftcangoblowm|
 
 .. PYVERSIONS
 
-\* Python 3.9 through 3.13, PyPy
+\* Python 3.11 through 3.15, PyPy-3.11
 
 **New in 0.2.x**
 
@@ -371,6 +374,9 @@ ASK FOR ABUSE
 
 - suggest a license written by a drunkard
 
+.. |last-commit| image:: https://img.shields.io/github/last-commit/msftcangoblowm/pytest-logging-strict/master
+    :target: https://github.com/msftcangoblowm/pytest-logging-strict/pulse
+    :alt: last commit to gauge activity
 .. |test-status| image:: https://github.com/msftcangoblowm/pytest-logging-strict/actions/workflows/testsuite.yml/badge.svg?branch=master&event=push
     :target: https://github.com/msftcangoblowm/pytest-logging-strict/actions/workflows/testsuite.yml
     :alt: Test suite status
@@ -380,9 +386,12 @@ ASK FOR ABUSE
 .. |kit| image:: https://img.shields.io/pypi/v/pytest-logging-strict
     :target: https://pypi.org/project/pytest-logging-strict/
     :alt: PyPI status
-.. |versions| image:: https://img.shields.io/pypi/pyversions/pytest-logging-strict.svg?logo=python&logoColor=FBE072
+.. |versions| image:: https://img.shields.io/badge/CI%20tested-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14%20%7C%203.15%20%7C%20pypy3.11-blue?logo=python&logoColor=FBE072
     :target: https://pypi.org/project/pytest-logging-strict/
     :alt: Python versions supported
+
+.. https://img.shields.io/pypi/pyversions/pytest-logging-strict.svg?logo=python&logoColor=FBE072
+
 .. |license| image:: https://img.shields.io/github/license/msftcangoblowm/pytest-logging-strict
     :target: https://pypi.org/project/pytest-logging-strict/blob/master/LICENSE.txt
     :alt: License
@@ -395,3 +404,10 @@ ASK FOR ABUSE
 .. |codecov| image:: https://codecov.io/gh/msftcangoblowm/pytest-logging-strict/graph/badge.svg?token=3aE90WoGKg
     :target: https://codecov.io/gh/msftcangoblowm/pytest-logging-strict
     :alt: pytest-logging-strict coverage percentage
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/ambv/black
+.. |downloads| image:: https://img.shields.io/pypi/dm/pytest-logging-strict
+.. |implementations| image:: https://img.shields.io/pypi/implementation/pytest-logging-strict
+.. |platforms| image:: https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey
+
+.. https://img.shields.io/badge/platform-linux-lightgrey

@@ -57,9 +57,15 @@ help:					## (Default) Display this help -- Always up to date
 
 #run all pre-commit checks
 .PHONY: pre-commit
+pre-commit: private target_tty = $(if $(show),1,0)
 pre-commit:				## Run checks found in .pre-commit-config.yaml
 ifeq ($(is_venv),1)
-	-@pre-commit run --all-files > /tmp/out.txt
+	@out=$$(SKIP=pyright pre-commit run --all-files ||:)
+	if [[ $(target_tty) -eq 1 ]]; then
+	echo "$$out" | tee /tmp/out.txt
+	else
+	echo "$$out" > /tmp/out.txt
+	fi
 endif
 
 
@@ -71,10 +77,19 @@ endif
 # $(VENV_BIN)/pytest --showlocals --cov=pytest_logging_strict --cov-report=term-missing --cov-config=pyproject.toml $(verbose_text) tests
 .PHONY: check
 check: private verbose_text = $(if $(v),"--verbose")
+check: private target_tty = $(if $(show),1,0)
 check:					## Run tests, generate coverage reports -- make [v=1] check
 ifeq ($(is_venv),1)
 	-@$(VENV_BIN_PYTHON) -m coverage erase
+	if [[ $(target_tty) -eq 1 ]]; then
 	$(VENV_BIN_PYTHON) -m coverage run --parallel -m pytest --showlocals $(verbose_text) tests
+	else
+	$(VENV_BIN_PYTHON) -m coverage run --parallel -m pytest --showlocals $(verbose_text) tests > /tmp/out_tests.err
+	fi
 	$(VENV_BIN_PYTHON) -m coverage combine
+	if [[ $(target_tty) -eq 1 ]]; then
 	$(VENV_BIN_PYTHON) -m coverage report --fail-under=68
+	else
+	$(VENV_BIN_PYTHON) -m coverage report --fail-under=68 > /tmp/out.report
+	fi
 endif

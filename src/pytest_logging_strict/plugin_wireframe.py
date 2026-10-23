@@ -55,8 +55,7 @@ def pytest_configure(config):
     :param config: pytest configuration
     :type config: pytest.Config
     """
-    global get_d_config_initialize
-    global logging_strict
+    global get_d_config_initialize, logging_strict
 
     xdist_worker_ = xdist_worker(config)
     impl_version = _get_arg_value(

@@ -27,7 +27,6 @@ In temp folder, 1st activate venv.
 
 from __future__ import annotations
 
-import sys
 import warnings
 from contextlib import nullcontext as does_not_raise
 from pathlib import (
@@ -36,18 +35,17 @@ from pathlib import (
 )
 from typing import (
     TYPE_CHECKING,
-    Any,
     cast,
 )
 from unittest.mock import patch
 
 import pytest
-from _pytest.python_api import RaisesContext
 
-if sys.version_info[:2] >= (3, 10):
-    from types import NoneType
-else:
-    NoneType = type(None)
+if TYPE_CHECKING:
+    from typing import Any
+
+    from .typing_only import DOES_NOT_OR_DOES
+
 
 testdata_config_in_pyproject_toml = (
     (
@@ -149,12 +147,14 @@ def test_fixture_logging_strict_v0(
     pytester: pytest.Pytester,
     impl_version_no: str,
     # xdist_args,
+    request: "pytest.FixtureRequest",
 ):
     """Test logging_strict plugin"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_logging_strict_v0" tests
     if TYPE_CHECKING:
         kwargs: dict[str, Any]
 
+    abspath_tests_dir = request.path.parent.parent
     # prepare
     path_pytester = pytester.path  # noqa: F841
     #    pytest plugins (specified in ``conftest.py`` module variable, pytest_plugins)
@@ -186,8 +186,7 @@ def test_fixture_logging_strict_v0(
     pytester.makepyprojecttoml(config_text)
 
     #    conftest.py
-    path_src = Path(__file__).parent.parent.joinpath("conftest.py")
-    conftest_text = path_src.read_text()
+    conftest_text = abspath_tests_dir.joinpath("conftest.py").read_text()
     pytester.makeconftest(conftest_text)
 
     #    a test file
@@ -282,42 +281,36 @@ def test_fixture_logging_strict_v0(
     assert exit_code == 0
 
 
-testdata_config_stash_dataclass = (
-    (
-        "deleteme.logging.config.yaml",
-        str,
-        does_not_raise(),
-        "deleteme.logging.config.yaml",
-    ),
-    (
-        "deleteme.logging.config.yaml",
-        Path,
-        does_not_raise(),
-        "deleteme.logging.config.yaml",
-    ),
-    (
-        0.2345,
-        float,
-        pytest.raises(TypeError),
-        0.2345,
-    ),
-)
-ids_config_stash_dataclass = (
-    "path",
-    "Path",
-    "float",
-)
-
-
 @pytest.mark.parametrize(
     "relpath_f, datatype, expectation, relpath_expected",
-    testdata_config_stash_dataclass,
-    ids=ids_config_stash_dataclass,
+    (
+        pytest.param(
+            "deleteme.logging.config.yaml",
+            str,
+            does_not_raise(),
+            "deleteme.logging.config.yaml",
+            id="path",
+        ),
+        pytest.param(
+            "deleteme.logging.config.yaml",
+            Path,
+            does_not_raise(),
+            "deleteme.logging.config.yaml",
+            id="Path",
+        ),
+        pytest.param(
+            0.2345,
+            float,
+            pytest.raises(TypeError),
+            0.2345,
+            id="float",
+        ),
+    ),
 )
 def test_config_stash_dataclass(
     relpath_f: str | float,
     datatype: type,
-    expectation: does_not_raise[NoneType] | RaisesContext[BaseException],
+    expectation: "DOES_NOT_OR_DOES",
     relpath_expected: str | float,
     tmp_path: Path,
 ) -> None:
@@ -344,31 +337,25 @@ def test_config_stash_dataclass(
         assert f_relpath_actual == f_relpath_expected
 
 
-testdata_configure = (
-    (
-        "write this to file",
-        True,
-    ),
-    (
-        "write this to file",
-        False,
-    ),
-    (
-        None,
-        True,
-    ),
-)
-ids_configure = (
-    "str_yaml extracts a str xdist on",
-    "str_yaml extracts a str xdist off",
-    "str_yaml extraction fails None",
-)
-
-
 @pytest.mark.parametrize(
     "get_yaml_return_value, is_xdist_plugin_on",
-    testdata_configure,
-    ids=ids_configure,
+    (
+        pytest.param(
+            "write this to file",
+            True,
+            id="str_yaml-extracts-a-str-xdist-on",
+        ),
+        pytest.param(
+            "write this to file",
+            False,
+            id="str_yaml-extracts-a-str-xdist-off",
+        ),
+        pytest.param(
+            None,
+            True,
+            id="str_yaml-extraction-fails-None",
+        ),
+    ),
 )
 def test_configure_v0(
     get_yaml_return_value: str | None,
@@ -461,12 +448,14 @@ def test_fixture_get_d_config(
     msg: str,
     pytester: pytest.Pytester,
     impl_version_no: str,
+    request: "pytest.FixtureRequest",
 ):
     """Run fixture get_d_config inprocess"""
     # pytest --showlocals -r a -vv --log-level INFO -k "test_fixture_get_d_config" tests
     if TYPE_CHECKING:
         kwargs_1: dict[str, Any]
 
+    abspath_tests_dir = request.path.parent.parent
     config_text = (
         "[build-system]\n"
         "requires = [\n"
@@ -503,8 +492,7 @@ def test_fixture_get_d_config(
 
     # prepare
     #    conftest.py
-    path_src = Path(__file__).parent.parent.joinpath("conftest.py")
-    conftest_text = path_src.read_text()
+    conftest_text = abspath_tests_dir.joinpath("conftest.py").read_text()
     pytester.makeconftest(conftest_text)
 
     #    no pyproject.toml nor cli
@@ -514,11 +502,10 @@ def test_fixture_get_d_config(
         config = pytester.parseconfig(*args_0)
 
     #    pre-extracted logging strict YAML file
-    path_f = Path(__file__).parent.parent.joinpath(
+    str_yaml = abspath_tests_dir.joinpath(
         "_good_files",
         "mp_1_asz.worker.logging.config.yaml",
-    )
-    str_yaml = path_f.read_text()
+    ).read_text()
 
     name = "test_get_d_config"
     source = (

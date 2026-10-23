@@ -1,4 +1,3 @@
 logging-strict
 pytest
 strictyaml
-typing-extensions; python_version<"3.11"
