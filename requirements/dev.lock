@@ -55,7 +55,7 @@ pathspec==0.12.1
     # via
     #   black
     #   blackdoc
-platformdirs==4.3.6
+platformdirs==4.9.6
     # via black
 pluggy==1.6.0
     # via pytest
