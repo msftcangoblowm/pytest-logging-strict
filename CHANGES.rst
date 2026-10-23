@@ -60,13 +60,18 @@ Changelog
    Commit items for NEXT VERSION
    ..............................
 
-   - ci(testsuite.yml): GITHUB_ENV vars for OS and Python version
-   - fix: virtualenv conflict with distlib tox packaging python-discovery
-   - chore: drop py39 py310
-   - ci: bump versions
-   - tests: pytest.mark.parametrize decorator testcases use pytest.param
-
 .. scriv-start-here
+
+.. _changes_0-2-4:
+
+Version 0.2.4 — 2026-10-23
+--------------------------------
+
+- chore: drop py39 py310
+- tests: pytest.mark.parametrize decorator testcases use pytest.param
+- ci(testsuite.yml): GITHUB_ENV vars for OS and Python version
+- fix: virtualenv conflict with distlib tox packaging python-discovery
+- ci: bump versions
 
 .. _changes_0-2-3:
 

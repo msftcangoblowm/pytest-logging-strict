@@ -16,7 +16,7 @@ pytest fixture logging configured from packaged YAML
 
 **New in 0.2.x**
 
-registry implementation; add fixture has_logging_occurred;
+registry implementation; add fixture has_logging_occurred; drop py39 py310;
 
 **New in 0.1.x**
 
